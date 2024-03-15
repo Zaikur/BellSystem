@@ -1,3 +1,9 @@
+/*
+Quinton Nelson
+3/13/2024
+This file handles relay activation
+*/
+
 #ifndef RelayManager_h
 #define RelayManager_h
 

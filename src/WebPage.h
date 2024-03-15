@@ -10,14 +10,15 @@ This header file contains function declarations, and private variables used in t
 
 class WebPage {
 public:
-    WebPage(const String& title); // Constructor that sets the page title
-    String generatePage(); // Generates the complete HTML page
-private:
-    String title;
-    String header();
-    String navigationBar();
-    String footer();
-    String body(const String& content); // A method to append specific body content
+        WebPage(const String& title) : pageType(title) {}; // Constructor that sets the page title
+        String generatePage(); // Generates the complete HTML page
+    private:
+        String title;
+        String header();
+        String navigationBar();
+        String footer();
+        String body(); // A method to append specific body content
+        String pageType;
 
     //CSS styles to be applied to each page
     String css = R"(

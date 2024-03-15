@@ -10,7 +10,7 @@ TimeManager::TimeManager() : timeClient(ntpUDP, "pool.ntp.org", 0, 60000) {}
 
 void TimeManager::updateTime() {
     timeClient.begin();
-    timeClient.setTimeOffset(-5 * 3600); // Set your timezone offset here
+    timeClient.setTimeOffset(-5 * 3600); // Set timezone offset here
     timeClient.update();
     Serial.print("Current time: ");
     Serial.println(timeClient.getFormattedTime());
