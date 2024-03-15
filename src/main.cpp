@@ -9,15 +9,15 @@ This file handles the main loop and setup of the program. It initializes the glo
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiManager.h>
-#include <EEPROM.h> // Include the EEPROM library for reading and writing to non-volatile memory
-
 #include <base64.h> // Include the base64 library for encoding and decoding
 
+#include "EEPROMLayoutManager.h"
 #include "TimeManager.h"
 #include "WebPage.h"
 #include "RelayManager.h"
 
 // Global objects
+EEPROMLayoutManager eepromManager;
 const int relayPin = 5;
 ESP8266WebServer server(80);
 RelayManager relay(relayPin);
@@ -25,7 +25,21 @@ TimeManager timeManager;
 
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(115200); // Start serial communication at 115200 baud
+    eepromManager.begin(512); // Initialize EEPROM with 512 bytes
+
+    // Attempt to load settings from EEPROM
+    String deviceName = eepromManager.loadDeviceName();
+    int ringDuration = eepromManager.loadRingDuration();
+
+    if(deviceName.length() == 0) {
+        // No device name saved, use a default name
+        deviceName = "bellsystem";
+    } else {
+        deviceName + "bellsystem"; // Append "bellsystem" to the device name
+        Serial.print("Device name loaded: ");
+        Serial.println(deviceName);
+    }
 
     // Setup WiFi
     WiFiManager wifiManager;
@@ -36,7 +50,7 @@ void setup() {
     }
 
     // Setup mDNS
-    if (!MDNS.begin("bellsystem")) { 
+    if (!MDNS.begin(deviceName.c_str())) { 
         Serial.println("Error setting up MDNS responder!");
     } else {
         Serial.println("mDNS responder started");
@@ -47,9 +61,33 @@ void setup() {
     // Setup routes
     server.on("/", HTTP_GET, []() {
       Serial.println("Home page called");
-      WebPage homePage("Home");
+      WebPage homePage("Home Page");
       String homePageHtml = homePage.generatePage();
       server.send(200, "text/html", homePageHtml);
+    });
+
+    server.on("/Settings", HTTP_GET, []() {
+      Serial.println("Settings page called");
+      WebPage settingsPage("Settings");
+      String settingsPageHtml = settingsPage.generatePage();
+      server.send(200, "text/html", settingsPageHtml);
+    });
+
+    server.on("/SaveSettings", HTTP_POST, []() {
+      Serial.println("SaveSettings called");
+      if (server.hasArg("deviceName")) {
+            String deviceName = server.arg("deviceName");
+            eepromManager.saveDeviceName(deviceName);
+            Serial.print("Device name received: ");
+            Serial.println(deviceName);
+        }
+        if (server.hasArg("ringDuration")) {
+            int ringDuration = server.arg("ringDuration").toInt();
+            eepromManager.saveRingDuration(ringDuration);
+            Serial.print("Ring duration received: ");
+            Serial.println(ringDuration);
+        }
+      server.send(200, "text/plain", "Settings saved");
     });
 
     // Example route for toggling the relay

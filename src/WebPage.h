@@ -35,6 +35,15 @@ public:
                 margin: 0 auto;
             }
 
+            /* Section styles */
+            .section {
+                background-color: #ffffff;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
             /* Banner styles */
             .banner {
                 background-color: #007bff;
@@ -55,6 +64,25 @@ public:
                 width: 100%;
             }
 
+            form .form-control:focus {
+                border-color: #0056b3;
+                box-shadow: 0 0 8px rgba(0, 86, 179, 0.1);
+            }
+
+            .btn:focus,
+            .btn:active {
+                outline: none;
+                box-shadow: 0 0 8px rgba(0, 86, 179, 0.6);
+            }
+
+            /* Error styles */
+            .error {
+                color: #ff0000;
+                margin-bottom: 15px;
+                font-size: 14px;
+            }
+
+
             /* Button styles */
             .btn {
                 display: inline-block;
@@ -72,7 +100,7 @@ public:
             }
 
             /* Navigation bar styles */
-                ul, li { 
+            ul, li { 
                     list-style: none; 
                 }
                 
