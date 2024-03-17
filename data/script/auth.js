@@ -10,18 +10,24 @@ $(document).ready(function() {
     function updateAuthButton() {
         const authToken = localStorage.getItem('authToken');
 
-        if (authToken) {
-            // If authToken exists, change the button to "Logout"
-            $('#loginButton').text('Logout').on('click', function() {
+        $('#loginButton').off('click').on('click', function(event) {
+            event.preventDefault(); // Prevent the default action of the anchor tag
+            if (authToken) {
+                // If authToken exists, handle logout
                 localStorage.removeItem('authToken');
-                window.location.reload();
-            });
+                window.location.href = '/'; // Redirect to index after logout
+            } else {
+                // If authToken doesn't exist, handle login
+                window.location.href = '/login'; // Redirect to the login page
+            }
+        });
+
+        if (authToken) {
+            // If authToken exists, change the button text to "Logout"
+            $('#loginButton').text('Logout');
         } else {
-            // If authToken doesn't exist, keep or set the button to "Login"
-            $('#loginButton').text('Login').off('click').on('click', function() {
-                window.location.href = '/login';
-            });
+            // If authToken doesn't exist, set or keep the button text to "Login"
+            $('#loginButton').text('Login');
         }
     }
 });
-

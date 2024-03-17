@@ -13,14 +13,21 @@
         body {
             background-color: #343a40; /* Dark background color */
             color: #fff; /* Light text color */
-            padding-top: 20px;
         }
         .navbar {
-            background-color: #212529; /* Dark navbar background */
+            background-color: #212529 !important;;
             border-bottom: 2px solid #495057; /* Slight border for separation */
         }
-        .form-control, .btn-primary {
-            border-radius: 0.25rem;
+        .form-control {
+            background-color: #495057;
+            color: #ffffff;
+            border: 1px solid #6c757d;
+        }
+        .form-control:focus {
+            background-color: #495057;
+            color: #ffffff;
+            border-color: #5cb85c;
+            box-shadow: none;
         }
         .btn-primary {
             background-color: #007bff;
@@ -29,6 +36,9 @@
         .btn-primary:hover {
             background-color: #0069d9;
             border-color: #0062cc;
+        }
+        #login-button {
+            cursor: pointer;
         }
     </style>
     <!-- jQuery and Bootstrap scripts -->
@@ -42,7 +52,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">{{deviceName}}'s Bell System</a>
+        <a class="navbar-brand" href="#">{{deviceName}} Management</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -54,12 +64,12 @@
                 <li class="nav-item"><a class="nav-link" href="/changepassword">Change Password</a></li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/login" id="loginButton">Login</a></li>
+                <li class="nav-item"><a class="nav-link" id="loginButton">Login</a></li>
             </ul>
         </div>
     </nav>
     
-    <div class="container mt-3">
+    <div class="container mt-4">
         <h1>Settings</h1>
         <form id="settingsForm">
             <div class="form-group">

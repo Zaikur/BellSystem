@@ -45,7 +45,7 @@ $(document).ready(function() {
             success: function(response) {
                 alert("Password changed successfully. Please log back in.");
                 localStorage.removeItem('authToken');
-                window.location.href = '/'; // Redirect after successful password change
+                window.location.href = '/login'; // Redirect after successful password change
             },
             error: function(xhr) {
                 alert("Error changing password.");

@@ -58,7 +58,7 @@ $(document).ready(function() {
             error: function(xhr, status, error) {
                 if (xhr.status == 403 || xhr.status == 401) {
                     // Unauthorized or Forbidden, redirect to login page
-                    alert("Authentication required. Please login.");
+                    alert("Session expired. Please logout and login again.");
                 } else {
                     // Handle other errors
                     alert("Failed to update settings.");

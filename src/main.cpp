@@ -38,6 +38,7 @@ void setup() {
 
     // Attempt to load settings from EEPROM
     String deviceName = eepromManager.loadDeviceName();
+    String uniqueURL = eepromManager.loadUniqueURL();
     Serial.println("Device name: " + deviceName); // Debugging
 
     // Setup WiFi
@@ -49,7 +50,7 @@ void setup() {
     }
 
     // Setup mDNS
-    if (!MDNS.begin(deviceName)) { 
+    if (!MDNS.begin(uniqueURL)) { 
         Serial.println("Error setting up MDNS responder!");
     } else {
         Serial.println("mDNS responder started");

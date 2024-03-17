@@ -10,26 +10,32 @@ $(document).ready(function() {
 
     function initScheduleForm() {
         daysOfWeek.forEach(day => {
-            const $dayDiv = $('<div class="day-schedule" id="schedule-' + day + '"></div>');
-            const $heading = $('<h3 class="day-heading">' + capitalizeFirstLetter(day) + '</h3>');
+            const $dayDiv = $('<div class="day-schedule mb-4" id="schedule-' + day + '"></div>');
+            const $heading = $('<h3 class="day-heading text-center">' + capitalizeFirstLetter(day) + '</h3>');
             const $timesContainer = $('<div class="times-container"></div>');
-            const $addRingButton = $('<button type="button" class="add-ring-button">Add Ring Time</button>').data('day', day);
-
-            $dayDiv.append($heading, $timesContainer, $addRingButton);
+    
+            const $buttonContainer = $('<div class="text-center mt-2"></div>');
+            const $addRingButton = $('<button type="button" class="btn btn-primary add-ring-button">Add Ring Time</button>').data('day', day);
+    
+            $buttonContainer.append($addRingButton);
+            $dayDiv.append($heading, $timesContainer, $buttonContainer); // Append the button container instead of the button directly
             $('#scheduleForm').append($dayDiv);
         });
     }
+    
 
     $('body').on('click', '.add-ring-button', function() {
         const day = $(this).data('day');
-        const $timesContainer = $(`#times-${day}`);
-        const $timeInputContainer = $('<div class="form-group time-input-container"></div>');
+        const $timesContainer = $(`#schedule-${day} .times-container`);
+        const $timeInputContainer = $('<div class="form-group time-input-container d-flex justify-content-center"></div>');
         const $newTimeInput = $('<input type="time" class="form-control ring-time" required>');
-        const $deleteButton = $('<button type="button" class="btn btn-danger btn-sm delete-time-button">Delete</button>');
-
+        const $deleteButton = $('<button type="button" class="btn btn-danger btn-sm delete-time-button ml-2">Delete</button>');
+    
         $timeInputContainer.append($newTimeInput, $deleteButton);
         $timesContainer.append($timeInputContainer);
     });
+    
+    
 
     $('body').on('click', '.delete-time-button', function() {
         $(this).closest('.time-input-container').remove();
@@ -40,7 +46,7 @@ $(document).ready(function() {
 
         daysOfWeek.forEach(day => {
             const times = [];
-            $('#schedule-' + day + ' .ring-time').each(function() {
+            $(`#schedule-${day} .ring-time`).each(function() {
                 times.push($(this).val());
             });
             scheduleData[day] = times;
@@ -63,7 +69,7 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/login.html';
+                    alert("Session expired, please logout and login again.")
                 } else {
                     alert("Failed to update schedule.");
                 }
@@ -77,4 +83,3 @@ $(document).ready(function() {
 
     initScheduleForm();
 });
-
