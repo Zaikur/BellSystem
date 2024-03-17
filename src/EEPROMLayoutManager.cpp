@@ -10,8 +10,9 @@ Contains methods to save and load data from EEPROM including ring schedule, ring
 
 EEPROMLayoutManager::EEPROMLayoutManager() {}
 
-void EEPROMLayoutManager::begin(size_t size) {
+bool EEPROMLayoutManager::begin(size_t size) {
     EEPROM.begin(size);
+    return true;
 }
 
 bool EEPROMLayoutManager::saveRingSchedule(const String& schedule) {
@@ -20,6 +21,10 @@ bool EEPROMLayoutManager::saveRingSchedule(const String& schedule) {
 
 bool EEPROMLayoutManager::wipeSavedSchedule() {
     return saveString("", scheduleStartAddr);
+}
+
+String EEPROMLayoutManager::loadRingSchedule() {
+    return loadString(scheduleStartAddr, 1000);
 }
 
 bool EEPROMLayoutManager::saveRingDuration(int duration) {
@@ -35,17 +40,29 @@ bool EEPROMLayoutManager::saveDeviceName(const String& deviceName) {
 }
 
 String EEPROMLayoutManager::loadDeviceName() {
-    String name = loadString(deviceNameAddr, 100); // Assuming max 100 characters for device name
-    if(name.length() > 0) {
-        name += "bellsystem"; // Append "bellsystem" to the device name
-        Serial.print("Device name loaded and modified: ");
+    String deviceName = loadString(deviceNameAddr, 100);
+    if (deviceName.length() > 0 && deviceName[0] == char(0xFF)) {
+        return "bellsystem"; // Return the default device name
     } else {
-        name = "bellsystem"; // Use default name
+        return deviceName; // Return the loaded device name
+    }
+}
+
+bool EEPROMLayoutManager::savePassword(const String& password) {
+    return saveString(password, passwordAddr);
+}
+
+String EEPROMLayoutManager::loadPassword() {
+    String password =  loadString(passwordAddr, 100);
+    if (password.length() > 0 && password[0] == char(0xFF)) {
+        return "password"; // Return the default password
+    } else {
+        return password; // Return the loaded password
     }
 }
 
 bool EEPROMLayoutManager::saveString(const String& data, int startAddr) {
-    int i;
+    unsigned int i;
     for (i = 0; i < data.length(); i++) {
         EEPROM.write(startAddr + i, data[i]);
     }
@@ -74,6 +91,23 @@ int EEPROMLayoutManager::loadInt(int startAddr) {
     return value;
 }
 
-size_t EEPROMLayoutManager::findEEPROMEnd() {
-    // Implement logic to dynamically find the end of the stored data, if needed
+// Token generation and storage
+String EEPROMLayoutManager::generateRandomToken() {
+    String token = "";
+    for (int i = 0; i < 16; i++) {
+        token += (char)random(33, 126);
+    }
+    return token;
+}
+
+bool EEPROMLayoutManager::saveSessionToken(const String& token) {
+    return saveString(token, 800);
+}
+
+bool EEPROMLayoutManager::checkSessionToken(const String& token) {
+    return token == loadString(800, 16);
+}
+
+bool EEPROMLayoutManager::wipeSessionToken() {
+    return saveString("", 800);
 }

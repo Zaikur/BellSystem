@@ -13,15 +13,23 @@ This file handles EEPROM management
 class EEPROMLayoutManager {
 public:
     EEPROMLayoutManager();
-    void begin(size_t size);
+    bool begin(size_t size);
     bool saveRingSchedule(const String& schedule);
     bool wipeSavedSchedule();
+    String loadRingSchedule();
     bool saveRingDuration(int duration);
     bool wipeSavedRingDuration();
     int loadRingDuration();
     bool saveDeviceName(const String& deviceName);
+    bool savePassword(const String& password);
+    String loadPassword();
     String loadDeviceName();
-    // Additional functionalities as needed
+    // Token generation and storage
+    String generateRandomToken();
+    bool saveSessionToken(const String& token);
+    bool checkSessionToken(const String& token);
+    bool wipeSessionToken();
+
 
 private:
     size_t findEEPROMEnd();
@@ -29,9 +37,10 @@ private:
     String loadString(int startAddr, int maxLen);
     bool saveInt(int value, int startAddr);
     int loadInt(int startAddr);
-    const int scheduleStartAddr = 0; // Starting address for the ring schedule
-    const int ringDurationStartAddr = 200; // Example address for WiFi credentials
-    const int deviceNameAddr = 400; // Example address for device name
+    const int scheduleStartAddr = 0; // Starting address for the ring schedule IS THIS CORRECT?
+    const int ringDurationStartAddr = 200;
+    const int deviceNameAddr = 400;
+    const int passwordAddr = 600;
     // Define more addresses as needed
 };
 

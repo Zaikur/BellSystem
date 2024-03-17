@@ -9,37 +9,36 @@ This file handles the main loop and setup of the program. It initializes the glo
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiManager.h>
-#include <base64.h> // Include the base64 library for encoding and decoding
+#include <LittleFS.h>
+#include <base64.h>
+#include <ArduinoJson.h>
 
 #include "EEPROMLayoutManager.h"
 #include "TimeManager.h"
-#include "WebPage.h"
 #include "RelayManager.h"
 
 // Global objects
 EEPROMLayoutManager eepromManager;
-const int relayPin = 5;
+const int relayPin = 5; // Pin for the relay module (GPIO5) 
 ESP8266WebServer server(80);
 RelayManager relay(relayPin);
 TimeManager timeManager;
 
-
 void setup() {
     Serial.begin(115200); // Start serial communication at 115200 baud
-    eepromManager.begin(512); // Initialize EEPROM with 512 bytes
+
+    if(!eepromManager.begin(1024)) {
+        Serial.println("Failed to initialize EEPROM");
+    } // Initialize EEPROM with 1024 bytes
+
+    if (!LittleFS.begin()) {
+        Serial.println("An Error has occurred while mounting LittleFS");
+        return;
+    }
 
     // Attempt to load settings from EEPROM
     String deviceName = eepromManager.loadDeviceName();
-    int ringDuration = eepromManager.loadRingDuration();
-
-    if(deviceName.length() == 0) {
-        // No device name saved, use a default name
-        deviceName = "bellsystem";
-    } else {
-        deviceName + "bellsystem"; // Append "bellsystem" to the device name
-        Serial.print("Device name loaded: ");
-        Serial.println(deviceName);
-    }
+    Serial.println("Device name: " + deviceName); // Debugging
 
     // Setup WiFi
     WiFiManager wifiManager;
@@ -50,32 +49,199 @@ void setup() {
     }
 
     // Setup mDNS
-    if (!MDNS.begin(deviceName.c_str())) { 
+    if (!MDNS.begin(deviceName)) { 
         Serial.println("Error setting up MDNS responder!");
     } else {
         Serial.println("mDNS responder started");
         MDNS.addService("http", "tcp", 80);
-        MDNS.begin("bellsystem"); // Start the mDNS responder with URL bellSystem.local
     }
 
     // Setup routes
-    server.on("/", HTTP_GET, []() {
-      Serial.println("Home page called");
-      WebPage homePage("Home Page");
-      String homePageHtml = homePage.generatePage();
-      server.send(200, "text/html", homePageHtml);
+    // Files were too big to be sent in one go, so they are sent in chunks.
+    server.on("/getSchedule", HTTP_GET, []() {          //ADD Server side validation                                    ADD SCHEDULE SAVING AND RETRIEVING
+        StaticJsonDocument<1024> doc; // For a known, manageable JSON size
+
+        // Correctly obtaining nested arrays according to new recommendations
+        JsonArray monday = doc["monday"].to<JsonArray>();
+        monday.add("08:00");
+        monday.add("12:00");
+
+        JsonArray tuesday = doc["tuesday"].to<JsonArray>();
+        tuesday.add("09:00");
+        tuesday.add("13:00");
+
+        String scheduleString;
+        ArduinoJson::serializeJson(doc, scheduleString);
+
+        server.send(200, "application/json", scheduleString); // Send schedule as JSON string
     });
 
-    server.on("/Settings", HTTP_GET, []() {
-      Serial.println("Settings page called");
-      WebPage settingsPage("Settings");
-      String settingsPageHtml = settingsPage.generatePage();
-      server.send(200, "text/html", settingsPageHtml);
+    server.on("/saveSchedule", HTTP_POST, []() {
+        String providedToken = server.header("Authorization");
+
+        if (!eepromManager.checkSessionToken(providedToken)) {
+            server.send(401, "text/plain", "Unauthorized");
+            return;
+        }
+
+        Serial.println("SaveSchedule called");
+        if (server.hasArg("schedule")) {
+            String schedule = server.arg("schedule");
+            eepromManager.saveRingSchedule(schedule); // Ensure schedule format and storage method is secure and efficient
+            Serial.print("Schedule received: ");
+            Serial.println(schedule);
+            server.send(200, "text/plain", "Schedule saved successfully");
+        } else {
+            server.send(400, "text/plain", "No schedule data received");
+        }
     });
 
-    server.on("/SaveSettings", HTTP_POST, []() {
-      Serial.println("SaveSettings called");
-      if (server.hasArg("deviceName")) {
+    server.on("/script/schedule.js", HTTP_GET, []() {
+        File file = LittleFS.open("/script/schedule.js", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the JS file, so send it as is
+        server.streamFile(file, "text/javascript");
+        file.close();
+    });
+
+    server.on("/schedule", HTTP_GET, []() {
+        File file = LittleFS.open("/schedule.html", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        server.streamFile(file, "text/html");
+    });
+
+    server.on("/login", HTTP_GET, []() {
+        File file = LittleFS.open("/login.html", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        server.streamFile(file, "text/html");
+        file.close();
+    });
+
+    server.on("/completeLogin", HTTP_POST, []() {
+        if (server.hasArg("password")) {
+            Serial.println("Password received");
+            String password = server.arg("password");
+            if (password == eepromManager.loadPassword()) {
+                Serial.println("Password correct");
+                String token = eepromManager.generateRandomToken();
+                eepromManager.saveSessionToken(token);
+                String jsonResponse = "{\"token\":\"" + token + "\"}";
+                server.send(200, "application/json", jsonResponse);
+            } else {
+                server.send(401, "text/plain", "Unauthorized");
+            }
+        } else {
+            server.send(400, "text/plain", "No password received");
+        }
+    });
+
+    server.on("/script/login.js", HTTP_GET, []() {
+        String jsContent;
+        File file = LittleFS.open("/script/login.js", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the JS file, so send it as is
+        server.streamFile(file, "text/javascript");
+        file.close();
+    });
+
+    server.on("/script/auth.js", HTTP_GET, []() {
+        String jsContent;
+        File file = LittleFS.open("/script/auth.js", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the JS file, so send it as is
+        server.streamFile(file, "text/javascript");
+        file.close();
+    });
+
+    server.on("/styles/styles.css", HTTP_GET, []() {
+        String cssContent;
+        File file = LittleFS.open("/styles/styles.css", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the CSS file, so send it as is
+        server.streamFile(file, "text/css");
+        file.close();
+    });
+
+    server.on("/styles/loginStyles.css", HTTP_GET, []() {
+        String cssContent;
+        File file = LittleFS.open("/styles/loginStyles.css", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the CSS file, so send it as is
+        server.streamFile(file, "text/css");
+        file.close();
+    });
+
+    server.on("/script/index.js", HTTP_GET, []() {
+        String jsContent;
+        File file = LittleFS.open("/script/index.js", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the JS file, so send it as is
+        server.streamFile(file, "text/javascript");
+        file.close();
+    });
+
+        server.on("/settings", HTTP_GET, []() {
+        String htmlContent;
+        File file = LittleFS.open("/settings.html", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        htmlContent = file.readString();
+        file.close();
+
+        // Replace the placeholder with the device name
+        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+        htmlContent.replace("{{ringDuration}}", String(eepromManager.loadRingDuration()));
+
+        server.send(200, "text/html", htmlContent);
+    });
+
+    server.on("/saveSettings", HTTP_POST, []() {
+        // Assuming the token is sent in the Authorization header
+        String providedToken = server.header("Authorization");
+
+        if (!eepromManager.checkSessionToken(providedToken)) {
+            // If the token check fails, respond with 401 Unauthorized
+            server.send(401, "text/plain", "Unauthorized");
+            return; // Stop further processing
+        }
+
+        Serial.println("SaveSettings called");
+        if (server.hasArg("deviceName")) {
             String deviceName = server.arg("deviceName");
             eepromManager.saveDeviceName(deviceName);
             Serial.print("Device name received: ");
@@ -87,14 +253,125 @@ void setup() {
             Serial.print("Ring duration received: ");
             Serial.println(ringDuration);
         }
-      server.send(200, "text/plain", "Settings saved");
+        server.send(200, "text/plain", "Settings saved");
+    });
+
+        server.on("/script/settings.js", HTTP_GET, []() {
+        String jsContent;
+        File file = LittleFS.open("/script/settings.js", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the JS file, so send it as is
+        server.streamFile(file, "text/javascript");
+        file.close();
+    });
+
+    server.on("/changepassword", HTTP_GET, []() {
+        File file = LittleFS.open("/changePassword.html", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        server.streamFile(file, "text/html");
+        file.close();
+    });
+
+    server.on("/script/changePassword.js", HTTP_GET, []() {
+        String jsContent;
+        File file = LittleFS.open("/script/changePassword.js", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        //No changes need to be made to the JS file, so send it as is
+        server.streamFile(file, "text/javascript");
+        file.close();
+    });
+
+    server.on("/finalizePassword", HTTP_POST, []() {
+        Serial.println("ChangePassword called");
+        if (!server.hasHeader("Content-Type") || server.header("Content-Type") != "application/json") {
+            server.send(400, "text/plain", "Server expects content-type: application/json");
+            return;
+        }
+
+        WiFiClient& client = server.client();
+        DynamicJsonDocument doc(1024);
+        deserializeJson(doc, client);
+
+        String providedToken = server.header("Authorization");
+
+        if (!eepromManager.checkSessionToken(providedToken)) {
+            server.send(401, "text/plain", "Unauthorized");
+            return;
+        }
+
+        String oldPassword = doc["OldPassword"];
+        String newPassword = doc["NewPassword"];
+        String storedPassword = eepromManager.loadPassword();
+
+        // Trim and compare
+        oldPassword.trim();
+        storedPassword.trim();
+
+        if (oldPassword.equals(storedPassword)) { 
+            eepromManager.savePassword(newPassword);
+            server.send(200, "text/plain", "Password changed successfully.");
+        } else {
+            server.send(401, "text/plain", "Invalid old password.");
+        }
+    });
+
+
+    server.on("/about", HTTP_GET, []() {
+        String htmlContent;
+        File file = LittleFS.open("/about.html", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        server.streamFile(file, "text/html");
+        file.close();
     });
 
     // Example route for toggling the relay
     server.on("/ToggleRelay", HTTP_GET, []() {
-      Serial.println("ToggleRelay called");
-      relay.activateRelay(2); // Activate the relay for 2 seconds
-      server.send(200, "text/plain", "Relay toggle successful");
+        String providedToken = server.header("Authorization");
+
+        if (!eepromManager.checkSessionToken(providedToken)) {
+            server.send(401, "text/plain", "Unauthorized");
+            return;
+        }
+
+        Serial.println("ToggleRelay called");
+        int duration = eepromManager.loadRingDuration();
+        relay.activateRelay(duration); // Activate the relay for saved duration
+        server.send(200, "text/plain", "Relay toggle successful");
+    });
+
+    //This method will be called when / is requested, it will send a response to the client with the content of the HTML file
+    //after replacing the placeholder with the device name
+    server.on("/", HTTP_GET, []() {
+        String htmlContent;
+        File file = LittleFS.open("/index.html", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        htmlContent = file.readString();
+        file.close();
+
+        // Replace the placeholder with the device name
+        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+
+        server.send(200, "text/html", htmlContent);
     });
 
     // Handle not found

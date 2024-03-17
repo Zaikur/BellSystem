@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "F:/Arduino Projects/Break_Bell"
+		},
+		{
+			"name": "BellSystem",
+			"path": ".."
+		},
+		{
+			"name": "240313-151552-arduino-webserver",
+			"path": "../../240313-151552-arduino-webserver"
+		},
+		{
+			"name": "240313-151726-arduino-wifiscan",
+			"path": "../../240313-151726-arduino-wifiscan"
+		}
+	],
+	"settings": {}
+}

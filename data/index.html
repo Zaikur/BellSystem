@@ -1,0 +1,57 @@
+<!--
+    Quinton Nelson
+    3/15/2024
+    Homepage for the ESP8266 Bell System
+-->
+<!Doctype html>
+<html>
+<head>
+    <title>{{deviceName}}'s Bell System</title>
+    <link rel="stylesheet" type="text/css" href="/styles/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/script/auth.js"></script>
+    <script src="/script/index.js"></script>
+</head>
+<body>
+    <h1 class='banner'>Home Page</h1>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/schedule">Schedule</a></li>
+            <li><a href="/settings">Settings</a></li>
+            <li><a href="/changepassword">Change Password</a></li>
+            <li><a href="/about">About</a></li>
+        </ul>
+    </nav>
+    
+    <h1>Welcome to {{deviceName}} Bell System Management</h1>
+    
+    <div class="container">
+        <!-- Current Time -->
+        <div class="item">
+            <h2>Current Time</h2>
+            <p><span id="time">0:00</span></p>
+        </div>
+        <!-- Ring Test Button -->
+        <div class="item">
+            <h2>Test Ring Functionality</h2>
+            <button class="submit-btn" id="testRingButton">Test Ring</button>
+        </div>
+        
+        <!-- Countdown to Next Scheduled Ring -->
+        <div class="item">
+            <h2>Next Scheduled Ring</h2>
+            <p>Countdown: <span id="countdown">Loading...</span></p>
+        </div>
+        
+        <!-- Error Display -->
+        <div class="item" id="errorSection">
+            <h2>System Messages</h2>
+            <p>No errors currently reported.</p>
+        </div>
+    </div>
+
+    <div id="loginContainer" style="padding: 10px;"></div>
+</body>
+</html>
+

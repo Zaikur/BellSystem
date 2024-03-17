@@ -1,0 +1,43 @@
+<!--
+    Quinton Nelson
+    3/15/2024
+    Settings page for the ESP8266 Bell System
+-->
+<!Doctype html>
+<html>
+    <head>
+        <title>Bell System Settings</title>
+        <link rel="stylesheet" type="text/css" href="/styles/styles.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="/script/auth.js"></script>
+        <script src="/script/settings.js"></script>
+    </head>
+
+    <body>
+        <h1 class='banner'>Settings</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/schedule">Schedule</a></li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/changepassword">Change Password</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </nav>
+        <form id="settingsForm" action="/savesettings" method="post">
+            <div>
+                <label for="deviceName">Device Name:</label>
+                <input type="text" id="deviceName" class="form-control" name="deviceName" value="{{deviceName}}" required>
+                <small class="error" id="deviceNameError"></small>
+            </div>
+            <div>
+                <label for="ringDuration">Ring Duration (seconds):</label>
+                <input type="number" id="ringDuration" class="form-control" name="ringDuration" value="{{ringDuration}}"  required>
+                <small class="error" id="ringDurationError"></small>
+            </div>
+            <button type="submit" class="submit-btn">Save Settings</button>
+        </form>
+
+        <div id="loginContainer" style="padding: 10px;"></div>
+    </body>
+</html>
