@@ -20,13 +20,15 @@ $(document).ready(function() {
         // Clear previous error messages
         $('#deviceNameError').text('');
         $('#ringDurationError').text('');
+        $('#uniqueURLError').text('');
 
         var deviceName = $('#deviceName').val();
         var ringDuration = $('#ringDuration').val();
+        var uniqueURL = $('#uniqueURL').val();
 
         // Validate Device Name (alphanumeric and hyphens/underscores only)
-        if(!/^[a-zA-Z0-9-_]+$/.test(deviceName)) {
-            $('#deviceNameError').text('Invalid characters in device name.');
+        if(!/^[a-zA-Z0-9-_]+$/.test(uniqueURL)) {
+            $('#uniqueURLError').text('Invalid characters in device name.');
             return; // Stop submission
         }
 
@@ -45,6 +47,7 @@ $(document).ready(function() {
                 'Authorization': authToken
             },
             data: {
+                uniqueURL: uniqueURL,
                 deviceName: deviceName,
                 ringDuration: ringDuration
             },

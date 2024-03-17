@@ -10,20 +10,27 @@
     <title>Schedule</title>
     <link rel="stylesheet" type="text/css" href="/styles/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/script/auth.js"></script>
-    <script src="/script/schedule.js"></script>
+    <script src="/script/auth.js" defer></script>
+    <script src="/script/schedule.js" defer></script>
 </head>
 <body>
-    <h1 class='banner'>Home Page</h1>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/schedule">Schedule</a></li>
-            <li><a href="/settings">Settings</a></li>
-            <li><a href="/changepassword">Change Password</a></li>
-            <li><a href="/about">About</a></li>
-        </ul>
+    <h1 class='banner'>Schedule Page</h1>
+    <nav class="navbar">
+        <button class="hamburger" id="hamburger">&#9776;</button>
+        <div class="nav-links" id="navLinks">
+            <ul class="left-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/schedule">Schedule</a></li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/changepassword">Change Password</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <ul class="right-links">
+                <li><a href="/login" id="loginButton">Login</a></li>
+            </ul>
+        </div>
     </nav>
+    
 
     <h1>Ring Schedule</h1>
     <form id="scheduleForm">

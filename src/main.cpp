@@ -105,6 +105,7 @@ void setup() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -157,6 +158,7 @@ void setup() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -170,6 +172,7 @@ void setup() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -183,6 +186,7 @@ void setup() {
 
         //No changes need to be made to the CSS file, so send it as is
         server.streamFile(file, "text/css");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -196,6 +200,7 @@ void setup() {
 
         //No changes need to be made to the CSS file, so send it as is
         server.streamFile(file, "text/css");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -209,6 +214,7 @@ void setup() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -225,6 +231,7 @@ void setup() {
 
         // Replace the placeholder with the device name
         htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+        htmlContent.replace("{{uniqueURL}}", eepromManager.loadUniqueURL());
         htmlContent.replace("{{ringDuration}}", String(eepromManager.loadRingDuration()));
 
         server.send(200, "text/html", htmlContent);
@@ -247,12 +254,19 @@ void setup() {
             Serial.print("Device name received: ");
             Serial.println(deviceName);
         }
+        if (server.hasArg("uniqueURL")) {
+            String uniqueURL = server.arg("uniqueURL");
+            eepromManager.saveUniqueURL(uniqueURL);
+            Serial.print("Unique URL received: ");
+            Serial.println(uniqueURL);
+        }
         if (server.hasArg("ringDuration")) {
             int ringDuration = server.arg("ringDuration").toInt();
             eepromManager.saveRingDuration(ringDuration);
             Serial.print("Ring duration received: ");
             Serial.println(ringDuration);
         }
+
         server.send(200, "text/plain", "Settings saved");
     });
 
@@ -266,6 +280,7 @@ void setup() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -290,6 +305,7 @@ void setup() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
+        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 

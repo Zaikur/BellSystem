@@ -24,6 +24,8 @@ public:
     bool savePassword(const String& password);
     String loadPassword();
     String loadDeviceName();
+    bool saveUniqueURL(const String& url);
+    String loadUniqueURL();
     // Token generation and storage
     String generateRandomToken();
     bool saveSessionToken(const String& token);

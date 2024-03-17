@@ -48,6 +48,19 @@ String EEPROMLayoutManager::loadDeviceName() {
     }
 }
 
+String EEPROMLayoutManager::loadUniqueURL() {
+    String url = loadString(700, 100);
+    if (url.length() > 0 && url[0] == char(0xFF)) {
+        return "bellsystem"; // Return the default device name
+    } else {
+        return url; // Return the loaded device name
+    }
+}
+
+bool EEPROMLayoutManager::saveUniqueURL(const String& url) {
+    return saveString(url, 700);
+}
+
 bool EEPROMLayoutManager::savePassword(const String& password) {
     return saveString(password, passwordAddr);
 }
