@@ -4,40 +4,61 @@
     Schedule page for the ESP8266 Bell System
 -->
 
-<!Doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Schedule</title>
-    <link rel="stylesheet" type="text/css" href="/styles/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{deviceName}}'s Schedule</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #343a40; /* Dark background color */
+            color: #fff; /* Light text color */
+            max-width: 1200px;
+        }
+        .navbar {
+            background-color: #212529 !important;
+            border-bottom: 2px solid #495057;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/script/auth.js" defer></script>
-    <script src="/script/schedule.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <h1 class='banner'>Schedule Page</h1>
-    <nav class="navbar">
-        <button class="hamburger" id="hamburger">&#9776;</button>
-        <div class="nav-links" id="navLinks">
-            <ul class="left-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/schedule">Schedule</a></li>
-                <li><a href="/settings">Settings</a></li>
-                <li><a href="/changepassword">Change Password</a></li>
-                <li><a href="/about">About</a></li>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">{{deviceName}}'s Bell System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item active"><a class="nav-link" href="/schedule">Schedule</a></li>
+                <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/changepassword">Change Password</a></li>
             </ul>
-            <ul class="right-links">
-                <li><a href="/login" id="loginButton">Login</a></li>
-            </ul>
+            <span class="navbar-text">
+                <a class="nav-link" href="/login" id="loginButton">Login</a>
+            </span>
         </div>
     </nav>
-    
 
-    <h1>Ring Schedule</h1>
-    <form id="scheduleForm">
-        <!-- Dynamically generated schedule form -->
-    </form>
-    <button type="button" class="submit-btn" id="saveScheduleBtn">Save Schedule</button>
+    <!-- Schedule Form -->
+    <div class="container my-4">
+        <h1>Ring Schedule</h1>
+        <form id="scheduleForm" class="my-3">
+            <!-- Dynamically generated schedule form will go here -->
+        </form>
+        <button type="button" class="btn btn-primary" id="saveScheduleBtn">Save Schedule</button>
+    </div>
 
-    <div id="loginContainer" style="padding: 10px;"></div>
+    <script src="/script/auth.js" defer></script>
+    <script src="/script/schedule.js" defer></script>
 </body>
 </html>
+

@@ -116,7 +116,14 @@ void setup() {
             return;
         }
 
-        server.streamFile(file, "text/html");
+        String htmlContent;
+        htmlContent = file.readString();
+        file.close();
+
+        // Replace the placeholder with the device name
+        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+
+        server.send(200, "text/html", htmlContent);
     });
 
     server.on("/login", HTTP_GET, []() {
@@ -176,34 +183,6 @@ void setup() {
         file.close();
     });
 
-    server.on("/styles/styles.css", HTTP_GET, []() {
-        String cssContent;
-        File file = LittleFS.open("/styles/styles.css", "r");
-        if (!file) {
-            Serial.println("Failed to open file for reading");
-            return;
-        }
-
-        //No changes need to be made to the CSS file, so send it as is
-        server.streamFile(file, "text/css");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
-        file.close();
-    });
-
-    server.on("/styles/loginStyles.css", HTTP_GET, []() {
-        String cssContent;
-        File file = LittleFS.open("/styles/loginStyles.css", "r");
-        if (!file) {
-            Serial.println("Failed to open file for reading");
-            return;
-        }
-
-        //No changes need to be made to the CSS file, so send it as is
-        server.streamFile(file, "text/css");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
-        file.close();
-    });
-
     server.on("/script/index.js", HTTP_GET, []() {
         String jsContent;
         File file = LittleFS.open("/script/index.js", "r");
@@ -218,7 +197,7 @@ void setup() {
         file.close();
     });
 
-        server.on("/settings", HTTP_GET, []() {
+    server.on("/settings", HTTP_GET, []() {
         String htmlContent;
         File file = LittleFS.open("/settings.html", "r");
         if (!file) {
@@ -291,8 +270,14 @@ void setup() {
             return;
         }
 
-        server.streamFile(file, "text/html");
+        String htmlContent;
+        htmlContent = file.readString();
         file.close();
+
+        // Replace the placeholder with the device name
+        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+
+        server.send(200, "text/html", htmlContent);
     });
 
     server.on("/script/changePassword.js", HTTP_GET, []() {
@@ -302,6 +287,7 @@ void setup() {
             Serial.println("Failed to open file for reading");
             return;
         }
+        
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
@@ -336,18 +322,6 @@ void setup() {
         }
     });
 
-    server.on("/about", HTTP_GET, []() {
-        String htmlContent;
-        File file = LittleFS.open("/about.html", "r");
-        if (!file) {
-            Serial.println("Failed to open file for reading");
-            return;
-        }
-
-        server.streamFile(file, "text/html");
-        file.close();
-    });
-
     // Example route for toggling the relay
     server.on("/ToggleRelay", HTTP_GET, []() {
         String providedToken = server.header("Authorization");
@@ -366,13 +340,13 @@ void setup() {
     //This method will be called when / is requested, it will send a response to the client with the content of the HTML file
     //after replacing the placeholder with the device name
     server.on("/", HTTP_GET, []() {
-        String htmlContent;
         File file = LittleFS.open("/index.html", "r");
         if (!file) {
             Serial.println("Failed to open file for reading");
             return;
         }
 
+        String htmlContent;
         htmlContent = file.readString();
         file.close();
 

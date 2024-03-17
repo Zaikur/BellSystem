@@ -22,10 +22,10 @@ $(document).ready(function() {
 
     $('body').on('click', '.add-ring-button', function() {
         const day = $(this).data('day');
-        const $timesContainer = $('#schedule-' + day + ' .times-container');
-        const $timeInputContainer = $('<div class="time-input-container"></div>');
-        const $newTimeInput = $('<input type="time" class="ring-time" required>');
-        const $deleteButton = $('<button type="button" class="delete-time-button">&#x2715;</button>');
+        const $timesContainer = $(`#times-${day}`);
+        const $timeInputContainer = $('<div class="form-group time-input-container"></div>');
+        const $newTimeInput = $('<input type="time" class="form-control ring-time" required>');
+        const $deleteButton = $('<button type="button" class="btn btn-danger btn-sm delete-time-button">Delete</button>');
 
         $timeInputContainer.append($newTimeInput, $deleteButton);
         $timesContainer.append($timeInputContainer);

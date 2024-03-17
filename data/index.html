@@ -7,58 +7,114 @@
 <html>
 <head>
     <title>{{deviceName}}'s Bell System</title>
-    <link rel="stylesheet" type="text/css" href="/styles/styles.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #343a40;
+            color: #fff;
+            max-width: 1200px;
+        }
+        .navbar {
+            background-color: #212529 !important;
+            border-bottom: 2px solid #495057;
+        }
+        .card {
+            height: 100%;
+            background-color: #495057 !important;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .card-title {
+            color: #17a2b8;
+        }
+        .btn-success {
+            width: 100%;
+        }
+        @media (min-width: 992px) {
+            .card-deck .card {
+                flex: 1 0 auto;
+            }
+        }
+    </style>
+    <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/script/auth.js" defer></script>
-    <script src="/script/index.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <h1 class='banner'>Home Page</h1>
-    <nav class="navbar">
-        <button class="hamburger" id="hamburger">&#9776;</button>
-        <div class="nav-links" id="navLinks">
-            <ul class="left-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/schedule">Schedule</a></li>
-                <li><a href="/settings">Settings</a></li>
-                <li><a href="/changepassword">Change Password</a></li>
-                <li><a href="/about">About</a></li>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">{{deviceName}} Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/schedule">Schedule</a></li>
+                <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/changepassword">Change Password</a></li>
             </ul>
-            <ul class="right-links">
-                <li><a href="/login" id="loginButton">Login</a></li>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/login" id="loginButton">Login</a></li>
             </ul>
         </div>
     </nav>
     
-    
-    <h1>{{deviceName}} Management</h1>
-    
-    <div class="container">
-        <!-- Current Time -->
-        <div class="item">
-            <h2>Current Time</h2>
-            <p><span id="time">0:00</span></p>
-        </div>
-        <!-- Ring Test Button -->
-        <div class="item">
-            <h2>Test Ring Functionality</h2>
-            <button class="submit-btn" id="testRingButton">Test Ring</button>
-        </div>
-        
-        <!-- Countdown to Next Scheduled Ring -->
-        <div class="item">
-            <h2>Next Scheduled Ring</h2>
-            <p>Countdown: <span id="countdown">Loading...</span></p>
-        </div>
-        
-        <!-- Error Display -->
-        <div class="item" id="errorSection">
-            <h2>System Messages</h2>
-            <p>No errors currently reported.</p>
+    <!-- Main Content -->
+    <div class="container mt-4">        
+        <!-- Info Grid -->
+        <div class="card-deck">
+            <!-- Countdown to Next Scheduled Ring -->
+            <div class="col-md-6 col-lg-6 mb-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Next Scheduled Ring</h5>
+                        <p class="card-text">Countdown: <span id="countdown">Loading...</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ring Test Button -->
+            <div class="col-md-6 col-lg-6 mb-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Test Ring Functionality</h5>
+                        <button class="btn btn-success" id="testRingButton">Test Ring</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Time -->
+            <div class="col-md-6 col-lg-6 mb-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Current Time</h5>
+                        <p class="card-text"><span id="time">0:00</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Display -->
+            <div class="col-md-6 col-lg-6 mb-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">System Messages</h5>
+                        <p class="card-text">No errors currently reported.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="loginContainer" style="padding: 10px;"></div>
+    <!-- Scripts -->
+    <script src="/script/auth.js" defer></script>
+    <script src="/script/index.js" defer></script>
 </body>
 </html>
 

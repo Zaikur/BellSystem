@@ -16,5 +16,7 @@
 			"path": "../../240313-151726-arduino-wifiscan"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "BellSystem"
+	}
 }

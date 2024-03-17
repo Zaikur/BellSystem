@@ -5,50 +5,80 @@
 -->
 <!Doctype html>
 <html>
-    <head>
-        <title>Bell System Settings</title>
-        <link rel="stylesheet" type="text/css" href="/styles/styles.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="/script/auth.js" defer></script>
-        <script src="/script/settings.js" defer></script>
-    </head>
-
-    <body>
-        <h1 class='banner'>Settings</h1>
-        <nav class="navbar">
-            <button class="hamburger" id="hamburger">&#9776;</button>
-            <div class="nav-links" id="navLinks">
-                <ul class="left-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/schedule">Schedule</a></li>
-                    <li><a href="/settings">Settings</a></li>
-                    <li><a href="/changepassword">Change Password</a></li>
-                    <li><a href="/about">About</a></li>
-                </ul>
-                <ul class="right-links">
-                    <li><a href="/login" id="loginButton">Login</a></li>
-                </ul>
-            </div>
-        </nav>
-        
-        
-        <form id="settingsForm" action="/savesettings" method="post">
-            <div>
-                <label for="uniqueURL">Unique URL:</label>
-                <input type="text" id="uniqueURL" class="form-control" name="uniqueURL" value="{{uniqueURL}}" required>
-                <small class="error" id="uniqueURLError"></small>
-            </div>
-            <div>
+<head>
+    <title>Bell System Settings</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #343a40; /* Dark background color */
+            color: #fff; /* Light text color */
+            padding-top: 20px;
+        }
+        .navbar {
+            background-color: #212529; /* Dark navbar background */
+            border-bottom: 2px solid #495057; /* Slight border for separation */
+        }
+        .form-control, .btn-primary {
+            border-radius: 0.25rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+    </style>
+    <!-- jQuery and Bootstrap scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom scripts -->
+    <script src="/script/auth.js" defer></script>
+    <script src="/script/settings.js" defer></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">{{deviceName}}'s Bell System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/schedule">Schedule</a></li>
+                <li class="nav-item active"><a class="nav-link" href="/settings">Settings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/changepassword">Change Password</a></li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/login" id="loginButton">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container mt-3">
+        <h1>Settings</h1>
+        <form id="settingsForm">
+            <div class="form-group">
                 <label for="deviceName">Device Name:</label>
                 <input type="text" id="deviceName" class="form-control" name="deviceName" value="{{deviceName}}" required>
-                <small class="error" id="deviceNameError"></small>
+                <small id="deviceNameError" class="form-text text-muted"></small>
             </div>
-            <div>
+            <div class="form-group">
                 <label for="ringDuration">Ring Duration (seconds):</label>
-                <input type="number" id="ringDuration" class="form-control" name="ringDuration" value="{{ringDuration}}"  required>
-                <small class="error" id="ringDurationError"></small>
+                <input type="number" id="ringDuration" class="form-control" name="ringDuration" value="{{ringDuration}}" required>
+                <small id="ringDurationError" class="form-text text-muted"></small>
             </div>
-            <button type="submit" class="submit-btn">Save Settings</button>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>
-    </body>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/script/auth.js" defer></script>
+    <script src="/script/settings.js" defer></script>
+</body>
 </html>
+
