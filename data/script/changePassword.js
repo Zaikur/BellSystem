@@ -35,17 +35,17 @@ $(document).ready(function() {
         $.ajax({
             url: '/finalizePassword',
             type: 'POST',
-            contentType: 'application/json', // Important for JSON payloads
-            data: JSON.stringify({
+            data: {
                 OldPassword: oldPassword,
                 NewPassword: newPassword
-            }),
+            },
             headers: {
                 'Authorization': authToken
             },
             success: function(response) {
-                alert("Password changed successfully.");
-                window.location.href = '/';
+                alert("Password changed successfully. Please log back in.");
+                localStorage.removeItem('authToken');
+                window.location.href = '/'; // Redirect after successful password change
             },
             error: function(xhr) {
                 alert("Error changing password.");

@@ -295,38 +295,30 @@ void setup() {
 
     server.on("/finalizePassword", HTTP_POST, []() {
         Serial.println("ChangePassword called");
-        if (!server.hasHeader("Content-Type") || server.header("Content-Type") != "application/json") {
-            server.send(400, "text/plain", "Server expects content-type: application/json");
-            return;
-        }
-
-        WiFiClient& client = server.client();
-        DynamicJsonDocument doc(1024);
-        deserializeJson(doc, client);
 
         String providedToken = server.header("Authorization");
-
         if (!eepromManager.checkSessionToken(providedToken)) {
             server.send(401, "text/plain", "Unauthorized");
             return;
         }
 
-        String oldPassword = doc["OldPassword"];
-        String newPassword = doc["NewPassword"];
-        String storedPassword = eepromManager.loadPassword();
+        if (server.hasArg("OldPassword") && server.hasArg("NewPassword")) {
+            String oldPassword = server.arg("OldPassword");
+            String newPassword = server.arg("NewPassword");
+            String storedPassword = eepromManager.loadPassword();
+            oldPassword.trim();
+            newPassword.trim();
 
-        // Trim and compare
-        oldPassword.trim();
-        storedPassword.trim();
-
-        if (oldPassword.equals(storedPassword)) { 
-            eepromManager.savePassword(newPassword);
-            server.send(200, "text/plain", "Password changed successfully.");
+            if (oldPassword == storedPassword) { 
+                eepromManager.savePassword(newPassword);
+                server.send(200, "text/plain", "Password changed successfully.");
+            } else {
+                server.send(401, "text/plain", "Invalid old password.");
+            }
         } else {
-            server.send(401, "text/plain", "Invalid old password.");
+            server.send(400, "text/plain", "Required parameters missing.");
         }
     });
-
 
     server.on("/about", HTTP_GET, []() {
         String htmlContent;
