@@ -3,6 +3,7 @@ Quinton Nelson
 3/15/2024
 This file handles EEPROM management
 Contains methods to save and load data from EEPROM including ring schedule, ring duration, and device name
+Start address for each data type is defined as a constant, and methods are provided to save and load data from these addresses
 */
 
 

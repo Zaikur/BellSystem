@@ -8,6 +8,7 @@ This file handles time synchronization with NTP, keeping track of the current ti
 
 TimeManager::TimeManager() : timeClient(ntpUDP, "pool.ntp.org", 0, 60000) {}
 
+// This method updates the time from the NTP server
 void TimeManager::updateTime() {
     timeClient.begin();
     timeClient.setTimeOffset(-5 * 3600); // Set timezone offset here

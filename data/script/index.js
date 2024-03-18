@@ -6,7 +6,7 @@ this file contains JQuery for the index page
 
 
 $(document).ready(function() {
-    // Test ring button
+    // This function calls the server to initiate a ring test if user is authenticated
     $('#testRingButton').click(function() {
         // Retrieve the stored token
         const authToken = localStorage.getItem('authToken');
@@ -36,18 +36,16 @@ $(document).ready(function() {
         });
     });
 
+    // This method will update the time every second
     function updateTime() {
         var now = new Date();
-        var hours = now.getHours().toString().padStart(2, '0');
-        var minutes = now.getMinutes().toString().padStart(2, '0');
-        var seconds = now.getSeconds().toString().padStart(2, '0');
-        var timeString = hours + ":" + minutes + ":" + seconds;
+        dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
         $('#time').text(timeString);
     }
 
     setInterval(updateTime, 1000); // Update time every second
 
-
+    // This method will update the countdown to next bell ring every second
     function updateCountdown() {
         var eventTime = new Date('March 20, 2024 12:00:00').getTime(); // Example event time
         var now = new Date().getTime();
@@ -67,6 +65,7 @@ $(document).ready(function() {
     }
     var countdownInterval = setInterval(updateCountdown, 1000);
 
+    // This method will display any error messages from the server
     function displayError(message) {
         $('#errorSection').text(message);
     }

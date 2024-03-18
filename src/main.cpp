@@ -18,19 +18,21 @@ This file handles the main loop and setup of the program. It initializes the glo
 #include "RelayManager.h"
 
 // Global objects
-EEPROMLayoutManager eepromManager;
+EEPROMLayoutManager eepromManager; // EEPROM manager object
 const int relayPin = 5; // Pin for the relay module (GPIO5) 
-ESP8266WebServer server(80);
-RelayManager relay(relayPin);
-TimeManager timeManager;
+ESP8266WebServer server(80); // HTTP server object
+RelayManager relay(relayPin); // Relay manager object
+TimeManager timeManager; // Time manager object
 
 void setup() {
     Serial.begin(115200); // Start serial communication at 115200 baud
 
-    if(!eepromManager.begin(1024)) {
+    // Initialize EEPROM with 2048 bytes and check if it was successful
+    if(!eepromManager.begin(2048)) {
         Serial.println("Failed to initialize EEPROM");
-    } // Initialize EEPROM with 1024 bytes
+    }
 
+    // Initialize LittleFS file system and check if it was successful
     if (!LittleFS.begin()) {
         Serial.println("An Error has occurred while mounting LittleFS");
         return;
@@ -41,7 +43,7 @@ void setup() {
     String uniqueURL = eepromManager.loadUniqueURL();
     Serial.println("Device name: " + deviceName); // Debugging
 
-    // Setup WiFi
+    // Setup WiFi manager and connect to WiFi network if not already connected
     WiFiManager wifiManager;
     if (!wifiManager.autoConnect("BellSystemSetupAP")) {
         Serial.println("Failed to connect and hit timeout");
@@ -49,7 +51,8 @@ void setup() {
         delay(1000);
     }
 
-    // Setup mDNS
+    // Setup mDNS responder and check if it was successful
+    // Set the unique URL to the device name set by the user (default is bellsystem)
     if (!MDNS.begin(uniqueURL)) { 
         Serial.println("Error setting up MDNS responder!");
     } else {
@@ -57,7 +60,7 @@ void setup() {
         MDNS.addService("http", "tcp", 80);
     }
 
-    // Setup routes
+    // Setup route endpoints for the HTTP server
     // Files were too big to be sent in one go, so they are sent in chunks.
     server.on("/getSchedule", HTTP_GET, []() {          //ADD Server side validation                                    ADD SCHEDULE SAVING AND RETRIEVING
         StaticJsonDocument<1024> doc; // For a known, manageable JSON size
@@ -323,7 +326,6 @@ void setup() {
         }
     });
 
-    // Example route for toggling the relay
     server.on("/ToggleRelay", HTTP_GET, []() {
         String providedToken = server.header("Authorization");
 

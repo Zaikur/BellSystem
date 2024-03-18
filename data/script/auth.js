@@ -7,6 +7,7 @@ this file contains JQuery that authenticates the user and handles the login/logo
 $(document).ready(function() {
     updateAuthButton();
 
+    // This method will update the login/logout button text based on the presence of the authToken
     function updateAuthButton() {
         const authToken = localStorage.getItem('authToken');
 
