@@ -9,11 +9,15 @@ This file handles time synchronization with NTP, keeping track of the current ti
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include <TimeLib.h>
+#include <time.h>
 
 class TimeManager {
 public:
     TimeManager();
-    void updateTime();
+    String getTime();
+    String getDateTime();
+    int getDayOfWeek();
 private:
     WiFiUDP ntpUDP;
     NTPClient timeClient;

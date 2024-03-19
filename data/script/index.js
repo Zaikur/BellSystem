@@ -36,10 +36,12 @@ $(document).ready(function() {
         });
     });
 
-    // This method will update the time every second
+    // This method will update the time ther server sent every second
+    // Verify that the server is sending the correct time
     function updateTime() {
         var now = new Date();
-        dateFormat(now, "dddd, mmmm dS, yyyy, h:MM:ss TT");
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        var timeString = new Intl.DateTimeFormat('en-US', options).format(now);
         $('#time').text(timeString);
     }
 

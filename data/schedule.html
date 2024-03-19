@@ -26,7 +26,7 @@
             border: 1px solid #6c757d;
         }
         input {
-            max-width: 150px;
+            max-width: 170px;
             text-align: center;
         }
         .form-control:focus {
@@ -37,6 +37,9 @@
         }
         .delete-time-button {
             margin-left: 5px;
+        }
+        .btn-block {
+            width: 200px;
         }
         #loginButton {
             cursor: pointer;
@@ -68,14 +71,33 @@
         </div>
     </nav>
 
+    <div class="import-container">
+
+    </div>
+
+
+
     <!-- Schedule Form Container -->
     <div class="container mt-4 d-flex flex-column align-items-center justify-content-center">
         <h1 class="text-center">Ring Schedule</h1>
+        <div class="row justify-content-center mb-3 mt-2">
+            <div class="col-12 col-sm-4 justify-content-center">
+                <button type="button" class="btn btn-info btn-block mb-2" id="exportScheduleBtn">Export Schedule</button>
+            </div>
+            <div class="col-12 col-sm-4 justify-content-center">
+                <input type="file" id="importScheduleFile" style="display:none;">
+                <button type="button" class="btn btn-info btn-block mb-2" id="importScheduleBtn">Import Schedule</button>
+            </div>
+            <div class="col-12 col-sm-4 justify-content-center">
+                <button type="button" class="btn btn-secondary btn-block mb-2" id="copyMondayScheduleBtn">Copy Monday to All</button>
+            </div>
+        </div>
         <form id="scheduleForm" class="w-100 my-3">
             <!-- Dynamically generated schedule form will go here -->
         </form>
         <button type="button" class="btn btn-success" id="saveScheduleBtn">Save Schedule</button>
     </div>
+    
 
 
     <script src="/script/auth.js" defer></script>
