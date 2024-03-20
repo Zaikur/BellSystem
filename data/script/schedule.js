@@ -7,7 +7,6 @@ this file contains JQuery to dynamically create the webpage for the schedule for
 
 $(document).ready(function() {
     const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-    const authToken = localStorage.getItem('authToken');
     let globalScheduleData = {};
 
     function init() {
@@ -62,8 +61,8 @@ $(document).ready(function() {
         });
 
         
-        if (!authToken) {
-            alert("You are not authenticated. Please login first.");
+        if (!checkServerTokenMatch()) {
+            showLoginModal();
             return;
         }
 
@@ -73,14 +72,15 @@ $(document).ready(function() {
             url: '/updateSchedule',
             type: 'POST',
             contentType: 'application/json',
-            headers: { 'Authorization': authToken },
+            headers: { 'Authorization': getAuthToken() },
             data: JSON.stringify(scheduleData),
             success: function(response) {
                 alert("Schedule updated successfully!");
             },
             error: function(xhr) {
                 if (xhr.status === 401 || xhr.status === 403) {
-                    alert("Session expired, please logout and login again.")
+                    alert("Session expired, please login again.")
+                    showLoginModal();
                 } else {
                     alert("Failed to update schedule.");
                 }
@@ -94,7 +94,7 @@ $(document).ready(function() {
             alert("No schedule data to export.");
             return;
         }
-        const scheduleData = JSON.stringify(globalScheduleData(), null, 2);
+        const scheduleData = JSON.stringify(globalScheduleData, null, 2);
         const blob = new Blob([scheduleData], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -147,7 +147,6 @@ $(document).ready(function() {
             url: '/getSchedule',
             type: 'GET',
             dataType: 'json',
-            headers: { 'Authorization': authToken }, // Assuming authToken is globally available
             success: function(scheduleData) {
                 if (Object.keys(scheduleData).length > 0) {
                     console.log("Current schedule:", scheduleData); /****************************************************** */
@@ -156,9 +155,6 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                if (xhr.status === 401 || xhr.status === 403) {
-                    alert("Session expired, please login.")
-                }
                 console.error("Failed to fetch current schedule:", error);
             }
         });

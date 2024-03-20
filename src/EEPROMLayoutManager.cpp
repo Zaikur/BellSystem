@@ -16,13 +16,12 @@ bool EEPROMLayoutManager::begin(size_t size) {
     return true;
 }
 
+
+
 // Ring schedule management
 bool EEPROMLayoutManager::saveRingSchedule(const String& schedule) {
-    Serial.println("Saving schedule: " + schedule);
     bool saveSuccess = saveString(schedule, scheduleStartAddr);
     // Immediately read back for verification
-    String verificationReadback = loadRingSchedule();
-    Serial.println("Verification readback: " + verificationReadback);
     return saveSuccess;
 }
 

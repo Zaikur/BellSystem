@@ -51,7 +51,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">{{deviceName}} Management</a>
+        <a class="navbar-brand" href="/">{{deviceName}} Management</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -113,6 +113,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-secondary">
+                    You must be logged in to continue.
+                    <form id="loginForm" class="mt-4">
+                        <div class="form-group">
+                            <input type="password" id="password" class="form-control" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Login</button>
+                        <button type="button" class="btn btn-warning btn-block" data-dismiss="modal">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
 
     <!-- Scripts -->
     <script src="/script/auth.js" defer></script>

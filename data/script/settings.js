@@ -11,9 +11,8 @@ $(document).ready(function() {
         event.preventDefault();
 
         // Retrieve the stored token
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) {
-            alert("You are not authenticated. Please login first.");
+        if (!checkServerTokenMatch()) {
+            showLoginModal();
             return;
         }
 
@@ -44,7 +43,7 @@ $(document).ready(function() {
             url: '/saveSettings',
             type: 'POST',
             headers: {
-                'Authorization': authToken
+                'Authorization': getAuthToken(),
             },
             data: {
                 uniqueURL: uniqueURL,
@@ -57,8 +56,7 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 if (xhr.status == 403 || xhr.status == 401) {
-                    // Unauthorized or Forbidden, redirect to login page
-                    alert("Session expired. Please logout and login again.");
+                    showLoginModal();
                 } else {
                     // Handle other errors
                     alert("Failed to update settings.");

@@ -9,9 +9,8 @@ $(document).ready(function() {
     // This function calls the server to initiate a ring test if user is authenticated
     $('#testRingButton').click(function() {
         // Retrieve the stored token
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) {
-            alert("You are not authenticated. Please login first.");
+        if (!checkServerTokenMatch()) {
+            showLoginModal();
             return;
         }
     
@@ -20,7 +19,7 @@ $(document).ready(function() {
             type: "GET",
             // Include the token in the request headers
             headers: {
-                "Authorization": authToken
+                "Authorization": getAuthToken()
             },
             success: function(data, textStatus, xhr) {
                 alert("Ring test initiated. Check device.");
@@ -28,7 +27,7 @@ $(document).ready(function() {
             error: function(xhr, status, error) {
                 if (xhr.status === 401 || xhr.status === 403) {
                     // Handle unauthorized or forbidden response
-                    alert("Authentication required. Please login.");
+                    showLoginModal();
                 } else {
                     alert("Error initiating ring test: " + error);
                 }

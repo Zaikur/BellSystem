@@ -19,9 +19,13 @@ class ScheduleManager {
     public:
         ScheduleManager();
         bool saveSchedule(const String& jsonSchedule);
-        String getSchedule();
+        String getScheduleString();
+        DynamicJsonDocument getScheduleJson();
         void handleRing();
     private:
         bool shouldRingNow();
         String dayOfWeekStr(int day);
+        void loadScheduleFromEEPROM();
+        DynamicJsonDocument currentSchedule;
+        int duration;
 };

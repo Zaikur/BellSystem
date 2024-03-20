@@ -6,36 +6,44 @@ This file handles reading a schedule from the client, saving it to EEPROM, and c
 
 #include "scheduleManager.h"
 
-ScheduleManager::ScheduleManager() : eepromManager(), timeManager(), relayManager(5) {
+/****************PUBLIC******************/
+
+
+// Constructor for ScheduleManager class that initializes the EEPROMLayoutManager, TimeManager, and RelayManager objects
+ScheduleManager::ScheduleManager() : eepromManager(), timeManager(), relayManager(5), currentSchedule(1024) {
     eepromManager.begin(2048);
+    loadScheduleFromEEPROM();
+    duration = eepromManager.loadRingDuration();
 }
 
+// This method saves the schedule to EEPROM and updates the currentSchedule object
 bool ScheduleManager::saveSchedule(const String& jsonSchedule) {
-    //ADD VALIDATION FOR JSON STRING**********************************************************
+    deserializeJson(currentSchedule, jsonSchedule);
     return eepromManager.saveRingSchedule(jsonSchedule);
 }
 
-String ScheduleManager::getSchedule() {
-    return eepromManager.loadRingSchedule();
+// This method returns the current schedule as a string
+String ScheduleManager::getScheduleString() {
+    return currentSchedule.as<String>();
 }
 
+// This method returns the current schedule as a JSON object
+DynamicJsonDocument ScheduleManager::getScheduleJson() {
+    return currentSchedule;
+}
+
+// This method checks if the bell should ring and activates the relay if it should
 void ScheduleManager::handleRing() {
     if (shouldRingNow()) {
-        int duration = eepromManager.loadRingDuration();
         relayManager.activateRelay(duration);
     }
 }
 
-bool ScheduleManager::shouldRingNow() {
-    String schedule = eepromManager.loadRingSchedule();
-    if (schedule.length() == 0) {
-        return false;
-    }
+/****************PRIVATE******************/
 
-    DynamicJsonDocument doc(1024);
-    deserializeJson(doc, schedule);
-    
-    JsonObject root = doc.as<JsonObject>();
+// This method checks if the bell should ring at the current time
+bool ScheduleManager::shouldRingNow() {
+    JsonObject root = currentSchedule.as<JsonObject>(); // Use currentSchedule
     String dayOfWeek = dayOfWeekStr(timeManager.getDayOfWeek());
     if (root.containsKey(dayOfWeek)) {
         JsonArray times = root[dayOfWeek].as<JsonArray>();
@@ -49,6 +57,7 @@ bool ScheduleManager::shouldRingNow() {
     return false;
 }
 
+// This method returns the day of the week as a string
 String ScheduleManager::dayOfWeekStr(int day) {
     switch (day) {
         case 1:
@@ -67,5 +76,13 @@ String ScheduleManager::dayOfWeekStr(int day) {
             return "saturday";
         default:
             return "";
+    }
+}
+
+// This method loads the current schedule from EEPROM to be stored in memory when the device starts
+void ScheduleManager::loadScheduleFromEEPROM() {
+    String schedule = eepromManager.loadRingSchedule();
+    if (schedule.length() > 0 && schedule[0] != char(0xFF)) {
+        deserializeJson(currentSchedule, schedule);
     }
 }

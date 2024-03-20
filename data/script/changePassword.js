@@ -14,10 +14,9 @@ $(document).ready(function() {
         var newPassword = $('#newPassword').val();
         var confirmPassword = $('#confirmPassword').val();
         var oldPassword = $('#oldPassword').val();
-        var authToken = localStorage.getItem('authToken'); // Retrieve the stored token
 
-        if (!authToken) {
-            alert("You are not authenticated. Please login first.");
+        if (!checkServerTokenMatch) {
+            showLoginModal();
             return;
         }
 
@@ -40,12 +39,12 @@ $(document).ready(function() {
                 NewPassword: newPassword
             },
             headers: {
-                'Authorization': authToken
+                'Authorization': getAuthToken()
             },
             success: function(response) {
                 alert("Password changed successfully. Please log back in.");
                 localStorage.removeItem('authToken');
-                window.location.href = '/login'; // Redirect after successful password change
+                showLoginModal(); // Redirect after successful password change
             },
             error: function(xhr) {
                 alert("Error changing password.");

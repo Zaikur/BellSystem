@@ -25,13 +25,18 @@ ESP8266WebServer server(80); // HTTP server object
 RelayManager relay(relayPin); // Relay manager object
 TimeManager timeManager; // Time manager object
 ScheduleManager scheduleManager; // Schedule manager object
+String deviceName; // Device name
+String uniqueURL; // Unique URL for the device
+int ringDuration; // Ring duration in seconds
+unsigned long lastRingTime = 0; // Last time the bell rang
+const long checkInterval = 6000; // Interval to check if the bell should ring (1 minute)
 
 
 void setup() {
     Serial.begin(115200); // Start serial communication at 115200 baud
 
     /********************************************************************************
-     * Setup services and objects
+     * Setup services and objects, and load settings from EEPROM
     ********************************************************************************/   
 
     // Initialize EEPROM with 2048 bytes and check if it was successful
@@ -39,17 +44,15 @@ void setup() {
         Serial.println("Failed to initialize EEPROM");
     }
 
+    deviceName = eepromManager.loadDeviceName();
+    uniqueURL = eepromManager.loadUniqueURL();
+    ringDuration = eepromManager.loadRingDuration();
+
     // Initialize LittleFS file system and check if it was successful
     if (!LittleFS.begin()) {
         Serial.println("An Error has occurred while mounting LittleFS");
         return;
     }
-
-    // Attempt to load settings from EEPROM
-    String deviceName = eepromManager.loadDeviceName();
-    String uniqueURL = eepromManager.loadUniqueURL();
-    Serial.println("Device name: " + deviceName); // Debugging
-    Serial.println("Unique URL: " + uniqueURL); // Debugging
 
     // Setup WiFi manager and connect to WiFi network if not already connected
     WiFiManager wifiManager;
@@ -75,25 +78,15 @@ void setup() {
     /*************************Schedule Page*************************************/
 
     server.on("/getSchedule", HTTP_GET, []() {
-        String providedToken = server.header("Authorization");
+        // Ensure no caching for dynamic content
+        server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        server.sendHeader("Pragma", "no-cache");
+        server.sendHeader("Expires", "-1");
 
-        if (!eepromManager.checkSessionToken(providedToken)) {
-            server.send(401, "text/plain", "Unauthorized");
-            return;
-        }
-
-        // Load the schedule string from EEPROM
-        String scheduleString = eepromManager.loadRingSchedule();
-        Serial.println("Schedule loaded: " + scheduleString);
-        StaticJsonDocument<1024> doc;
-        DeserializationError error = deserializeJson(doc, scheduleString);
-        if (error) {
-            Serial.print(F("deserializeJson() failed: "));
-            Serial.println(error.c_str());
-        }
-
-        server.send(200, "application/json", scheduleString);
+        String scheduleJson = scheduleManager.getScheduleString(); // Get the schedule as a string
+        server.send(200, "application/json", scheduleJson);
     });
+
 
 
     server.on("/updateSchedule", HTTP_POST, []() {
@@ -124,7 +117,6 @@ void setup() {
             return;
         }
 
-        // Now you can use the JSON object, for example:
         // Serialize JSON to String and save it
         if (eepromManager.saveRingSchedule(schedule)) {
             server.send(200, "text/plain", "Schedule saved successfully");
@@ -210,6 +202,17 @@ void setup() {
 
     /*************************Authentication*************************************/
 
+    server.on("/auth", HTTP_GET, []() {
+        String providedToken = server.header("Authorization");
+
+        if (!eepromManager.checkSessionToken(providedToken)) {
+            server.send(401, "text/plain", "Unauthorized");
+            return;
+        }
+
+        server.send(200, "text/plain", "Authorized");
+    });
+
     server.on("/script/auth.js", HTTP_GET, []() {
         String jsContent;
         File file = LittleFS.open("/script/auth.js", "r");
@@ -249,8 +252,7 @@ void setup() {
         }
 
         Serial.println("ToggleRelay called");
-        int duration = eepromManager.loadRingDuration();
-        relay.activateRelay(duration); // Activate the relay for saved duration
+        relay.activateRelay(ringDuration); // Activate the relay for saved duration
         server.send(200, "text/plain", "Relay toggle successful");
     });
 
@@ -286,9 +288,14 @@ void setup() {
         file.close();
 
         // Replace the placeholder with the device name
-        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
-        htmlContent.replace("{{uniqueURL}}", eepromManager.loadUniqueURL());
-        htmlContent.replace("{{ringDuration}}", String(eepromManager.loadRingDuration()));
+        htmlContent.replace("{{deviceName}}", deviceName);
+        htmlContent.replace("{{uniqueURL}}", uniqueURL);
+        htmlContent.replace("{{ringDuration}}", String(ringDuration));
+
+        // Set Cache-Control headers
+        server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        server.sendHeader("Pragma", "no-cache");
+        server.sendHeader("Expires", "-1");
 
         server.send(200, "text/html", htmlContent);
     });
@@ -305,19 +312,19 @@ void setup() {
 
         Serial.println("SaveSettings called");
         if (server.hasArg("deviceName")) {
-            String deviceName = server.arg("deviceName");
+            deviceName = server.arg("deviceName");
             eepromManager.saveDeviceName(deviceName);
             Serial.print("Device name received: ");
             Serial.println(deviceName);
         }
         if (server.hasArg("uniqueURL")) {
-            String uniqueURL = server.arg("uniqueURL");
+            uniqueURL = server.arg("uniqueURL");
             eepromManager.saveUniqueURL(uniqueURL);
             Serial.print("Unique URL received: ");
             Serial.println(uniqueURL);
         }
         if (server.hasArg("ringDuration")) {
-            int ringDuration = server.arg("ringDuration").toInt();
+            ringDuration = server.arg("ringDuration").toInt();
             eepromManager.saveRingDuration(ringDuration);
             Serial.print("Ring duration received: ");
             Serial.println(ringDuration);
@@ -354,7 +361,7 @@ void setup() {
         file.close();
 
         // Replace the placeholder with the device name
-        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+        htmlContent.replace("{{deviceName}}", deviceName);
 
         server.send(200, "text/html", htmlContent);
     });
@@ -411,6 +418,14 @@ void setup() {
 }
 
 void loop() {
+    // Check if the bell should ring once every minute
+    // Use unsigned long to prevent overflow when millis() reaches its maximum value after 50 days and a 'rollover' occurs
+    // Overflow is prevented by using subtraction instead of addition to calculate the time difference
+    unsigned long currentMillis = millis();
+    if (currentMillis - lastRingTime >= checkInterval) {
+        lastRingTime = currentMillis;
+        scheduleManager.handleRing(); // Check if the bell should ring
+    }
     server.handleClient();
     MDNS.update();
 }
