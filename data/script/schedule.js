@@ -61,30 +61,29 @@ $(document).ready(function() {
         });
 
         
-        if (!checkServerTokenMatch()) {
-            showLoginModal();
-            return;
-        }
-
-        console.log(scheduleData);  /****************************************************** */
-        
-        $.ajax({
-            url: '/updateSchedule',
-            type: 'POST',
-            contentType: 'application/json',
-            headers: { 'Authorization': getAuthToken() },
-            data: JSON.stringify(scheduleData),
-            success: function(response) {
-                alert("Schedule updated successfully!");
-            },
-            error: function(xhr) {
-                if (xhr.status === 401 || xhr.status === 403) {
-                    alert("Session expired, please login again.")
-                    showLoginModal();
-                } else {
-                    alert("Failed to update schedule.");
-                }
+        checkServerTokenMatch(function(tokenMatches) {
+            if (!tokenMatches) {
+                // If token doesn't match, show login modal and stop further execution
+                return;
             }
+        
+            $.ajax({
+                url: '/updateSchedule',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'Authorization': getAuthToken() },
+                data: JSON.stringify(scheduleData),
+                success: function(response) {
+                    alert("Schedule updated successfully!");
+                },
+                error: function(xhr) {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        showLoginModal();
+                    } else {
+                        alert("Failed to update schedule.");
+                    }
+                }
+            });
         });
     });
 

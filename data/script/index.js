@@ -8,30 +8,31 @@ this file contains JQuery for the index page
 $(document).ready(function() {
     // This function calls the server to initiate a ring test if user is authenticated
     $('#testRingButton').click(function() {
-        // Retrieve the stored token
-        if (!checkServerTokenMatch()) {
-            showLoginModal();
-            return;
-        }
-    
-        $.ajax({
-            url: "/ToggleRelay",
-            type: "GET",
-            // Include the token in the request headers
-            headers: {
-                "Authorization": getAuthToken()
-            },
-            success: function(data, textStatus, xhr) {
-                alert("Ring test initiated. Check device.");
-            },
-            error: function(xhr, status, error) {
-                if (xhr.status === 401 || xhr.status === 403) {
-                    // Handle unauthorized or forbidden response
-                    showLoginModal();
-                } else {
-                    alert("Error initiating ring test: " + error);
-                }
+        checkServerTokenMatch(function(tokenMatches) {
+            if (!tokenMatches) {
+                // If token doesn't match, show login modal and stop further execution
+                return;
             }
+    
+            $.ajax({
+                url: "/ToggleRelay",
+                type: "GET",
+                // Include the token in the request headers
+                headers: {
+                    "Authorization": getAuthToken()
+                },
+                success: function(data, textStatus, xhr) {
+                    alert("Ring test initiated. Check device.");
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        // Handle unauthorized or forbidden response
+                        showLoginModal();
+                    } else {
+                        alert("Error initiating ring test: " + error);
+                    }
+                }
+            });
         });
     });
 

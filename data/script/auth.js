@@ -5,12 +5,12 @@ this file contains JQuery that authenticates the user and handles the login/logo
 */
 
 // This function will check if the client-side token matches the server-side token
-function checkServerTokenMatch() {
+function checkServerTokenMatch(callback) {
     const authToken = getAuthToken();
     if (!authToken) {
-        // No token present on the client-side, probably not logged in or token was removed
         showLoginModal();
-        return false;
+        callback(false); // Immediately invoke callback with false
+        return;
     }
 
     $.ajax({
@@ -18,13 +18,13 @@ function checkServerTokenMatch() {
         type: 'GET',
         headers: { 'Authorization': authToken },
         success: function(response) {
-            return true;
+            callback(true); // Token matches, invoke callback with true
         },
         error: function(xhr) {
             if (xhr.status === 401) {
-                // Token is invalid, prompt login without losing state
                 showLoginModal();
             }
+            callback(false); // Token does not match, invoke callback with false
         }
     });
 }
@@ -73,7 +73,7 @@ $(document).ready(function() {
             success: function(response) {
                 var token = response.token; // Adjust based on the actual response structure
                 localStorage.setItem('authToken', token);
-                window.location.href = '/';
+                $('#loginModal').modal('hide');
             },
             error: function() {
                 $('#loginMessage').text('Login failed. Please try again.');

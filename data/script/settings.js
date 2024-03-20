@@ -10,12 +10,6 @@ $(document).ready(function() {
         // Prevent form submission for manual validation
         event.preventDefault();
 
-        // Retrieve the stored token
-        if (!checkServerTokenMatch()) {
-            showLoginModal();
-            return;
-        }
-
         // Clear previous error messages
         $('#deviceNameError').text('');
         $('#ringDurationError').text('');
@@ -37,31 +31,38 @@ $(document).ready(function() {
             return; // Stop submission
         }
 
-        // Submit the form if validation passes
-        // Make AJAX request with the token
-        $.ajax({
-            url: '/saveSettings',
-            type: 'POST',
-            headers: {
-                'Authorization': getAuthToken(),
-            },
-            data: {
-                uniqueURL: uniqueURL,
-                deviceName: deviceName,
-                ringDuration: ringDuration
-            },
-            success: function(response) {
-                // Handle success
-                alert("Settings updated successfully!");
-            },
-            error: function(xhr, status, error) {
-                if (xhr.status == 403 || xhr.status == 401) {
-                    showLoginModal();
-                } else {
-                    // Handle other errors
-                    alert("Failed to update settings.");
-                }
+        checkServerTokenMatch(function(tokenMatches) {
+            if (!tokenMatches) {
+                // If token doesn't match, show login modal and stop further execution
+                return;
             }
+
+            // Submit the form if validation passes
+            // Make AJAX request with the token
+            $.ajax({
+                url: '/saveSettings',
+                type: 'POST',
+                headers: {
+                    'Authorization': getAuthToken(),
+                },
+                data: {
+                    uniqueURL: uniqueURL,
+                    deviceName: deviceName,
+                    ringDuration: ringDuration
+                },
+                success: function(response) {
+                    // Handle success
+                    alert("Settings updated successfully!");
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status == 403 || xhr.status == 401) {
+                        showLoginModal();
+                    } else {
+                        // Handle other errors
+                        alert("Failed to update settings.");
+                    }
+                }
+            });
         });
     });
 });
