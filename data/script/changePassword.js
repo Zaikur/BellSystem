@@ -30,27 +30,33 @@ $(document).ready(function() {
             return; // Stop submission
         }
 
-        // Make AJAX request with token to change password
-        $.ajax({
-            url: '/finalizePassword',
-            type: 'POST',
-            data: {
-                OldPassword: oldPassword,
-                NewPassword: newPassword
-            },
-            headers: {
-                'Authorization': getAuthToken()
-            },
-            success: function(response) {
-                alert("Password changed successfully. Please log back in.");
-                localStorage.removeItem('authToken');
-                showLoginModal(); // Redirect after successful password change
-            },
-            error: function(xhr) {
-                alert("Error changing password.");
+        checkServerTokenMatch(function(tokenMatches) {
+            if (!tokenMatches) {
+                // If token doesn't match, show login modal and stop further execution
+                return;
             }
-        });
-        
+
+            // Make AJAX request with token to change password
+            $.ajax({
+                url: '/finalizePassword',
+                type: 'POST',
+                data: {
+                    OldPassword: oldPassword,
+                    NewPassword: newPassword
+                },
+                headers: {
+                    'Authorization': getAuthToken()
+                },
+                success: function(response) {
+                    alert("Password changed successfully. Please log back in.");
+                    localStorage.removeItem('authToken');
+                    showLoginModal(); // Redirect after successful password change
+                },
+                error: function(xhr) {
+                    alert("Error changing password.");
+                }
+            });
+        });        
     });
 });
 

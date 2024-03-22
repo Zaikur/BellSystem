@@ -37,6 +37,7 @@ function getAuthToken() {
 // This function will display a login modal
 function showLoginModal() {
     $('#loginModal').modal('show');
+    $('#password').focus();
 }
 
 $(document).ready(function() {

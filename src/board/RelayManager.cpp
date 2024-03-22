@@ -11,10 +11,11 @@ RelayManager::RelayManager(int pin) : relayPin(pin) {
     pinMode(relayPin, OUTPUT);
 }
 
-// This method activates the relay for a given duration
-void RelayManager::activateRelay(int duration) {
+// This method activates the relay for a given duration, then deactivates it
+// Duration pulled from global variable ringDuration
+void RelayManager::activateRelay() {
     Serial.println("Activating relay");
     digitalWrite(relayPin, HIGH);
-    delay(duration * 1000);
+    delay(ringDuration * 1000);
     digitalWrite(relayPin, LOW);
 }

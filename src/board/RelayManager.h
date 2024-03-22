@@ -9,10 +9,13 @@ This file handles relay activation
 
 #include <Arduino.h>
 
+// Global variable initialized in main.cpp
+extern int ringDuration;
+
 class RelayManager {
 public:
     RelayManager(int pin);
-    void activateRelay(int duration);
+    void activateRelay();
 private:
     int relayPin;
 };

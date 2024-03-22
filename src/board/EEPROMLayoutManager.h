@@ -44,14 +44,13 @@ private:
     String loadString(int startAddr, int maxLen);
     bool saveInt(int value, int startAddr);
     int loadInt(int startAddr);
-     // Starting address for the ring schedule IS THIS CORRECT?
-    const int ringDurationStartAddr = 0;
-    const int deviceNameAddr = 50;
-    const int uniqueURLAddr = 150;
-    const int passwordAddr = 250;
-    const int sessionTokenAddr = 350;
-    const int scheduleStartAddr = 400;
-    // Define more addresses as needed
+    
+    const int ringDurationStartAddr = 100;
+    const int deviceNameAddr = 200;
+    const int uniqueURLAddr = 300;
+    const int passwordAddr = 400;
+    const int sessionTokenAddr = 500;
+    const int scheduleStartAddr = 600;
 };
 
 #endif

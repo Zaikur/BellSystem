@@ -18,7 +18,7 @@ bool EEPROMLayoutManager::begin(size_t size) {
 
 
 
-// Ring schedule management
+/****************************Ring schedule****************************/
 bool EEPROMLayoutManager::saveRingSchedule(const String& schedule) {
     bool saveSuccess = saveString(schedule, scheduleStartAddr);
     // Immediately read back for verification
@@ -39,16 +39,24 @@ String EEPROMLayoutManager::loadRingSchedule() {
     }
 }
 
-// Ring duration management
+/****************************Ring duration****************************/
 bool EEPROMLayoutManager::saveRingDuration(int duration) {
     return saveInt(duration, ringDurationStartAddr);
 }
 
 int EEPROMLayoutManager::loadRingDuration() {
-    return loadInt(ringDurationStartAddr);
+    int duration = loadInt(ringDurationStartAddr);
+    Serial.println("Loaded ring duration: " + String(duration));
+    if (duration == 0) {
+        return 2; // Return the default ring duration
+    } else if (duration > 10 || duration < 0) {
+        return 2;
+    } else {
+        return duration; // Return the loaded ring duration
+    }
 }
 
-// Device name management
+/****************************Device settings****************************/
 bool EEPROMLayoutManager::saveDeviceName(const String& deviceName) {
     return saveString(deviceName, deviceNameAddr);
 }
@@ -62,7 +70,7 @@ String EEPROMLayoutManager::loadDeviceName() {
     }
 }
 
-// Unique URL management
+/*****************************Unique URL******************************/
 String EEPROMLayoutManager::loadUniqueURL() {
     String url = loadString(uniqueURLAddr, 100);
     if (url.length() > 0 && url[0] == char(0xFF)) {
@@ -76,7 +84,7 @@ bool EEPROMLayoutManager::saveUniqueURL(const String& url) {
     return saveString(url, uniqueURLAddr);
 }
 
-// Password management
+/*****************************Password******************************/
 bool EEPROMLayoutManager::savePassword(const String& password) {
     return saveString(password, passwordAddr);
 }
@@ -90,7 +98,7 @@ String EEPROMLayoutManager::loadPassword() {
     }
 }
 
-// Token generation and storage
+/*****************************Session token******************************/
 String EEPROMLayoutManager::generateRandomToken() {
     String token = "";
     for (int i = 0; i < 16; i++) {
@@ -104,15 +112,19 @@ bool EEPROMLayoutManager::saveSessionToken(const String& token) {
 }
 
 bool EEPROMLayoutManager::checkSessionToken(const String& token) {
-    return token == loadString(sessionTokenAddr, 16);
+    return token == loadString(sessionTokenAddr, 100);
 }
 
 bool EEPROMLayoutManager::wipeSessionToken() {
-    return saveString("", 800);
+    return saveString("", sessionTokenAddr);
 }
 
+
+
+/****************************Private methods****************************/
 bool EEPROMLayoutManager::saveString(const String& data, int startAddr) {
     unsigned int i;
+    Serial.println("Saving string: " + data);
     for (i = 0; i < data.length(); i++) {
         EEPROM.write(startAddr + i, data[i]);
     }
@@ -140,5 +152,6 @@ bool EEPROMLayoutManager::saveInt(int value, int startAddr) {
 int EEPROMLayoutManager::loadInt(int startAddr) {
     int value;
     EEPROM.get(startAddr, value);
+    Serial.println("Loaded int: " + String(value));
     return value;
 }

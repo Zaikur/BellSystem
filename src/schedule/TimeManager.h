@@ -7,20 +7,19 @@ This file handles time synchronization with NTP, keeping track of the current ti
 #ifndef TimeManager_h
 #define TimeManager_h
 
-#include <NTPClient.h>
+#include <Arduino.h>
+#include <ezTime.h>
 #include <WiFiUdp.h>
-#include <TimeLib.h>
-#include <time.h>
 
 class TimeManager {
 public:
     TimeManager();
+    void begin();
     String getTime();
     String getDateTime();
     int getDayOfWeek();
 private:
-    WiFiUDP ntpUDP;
-    NTPClient timeClient;
+    Timezone myTimeZone;
 };
 
 #endif
