@@ -63,7 +63,7 @@ $(document).ready(function() {
         
         checkServerTokenMatch(function(tokenMatches) {
             if (!tokenMatches) {
-                // If token doesn't match, show login modal and stop further execution
+                showLoginModal();
                 return;
             }
         

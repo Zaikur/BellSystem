@@ -33,7 +33,7 @@ $(document).ready(function() {
 
         checkServerTokenMatch(function(tokenMatches) {
             if (!tokenMatches) {
-                // If token doesn't match, show login modal and stop further execution
+                showLoginModal();
                 return;
             }
 
@@ -44,6 +44,7 @@ $(document).ready(function() {
                 type: 'POST',
                 headers: {
                     'Authorization': getAuthToken(),
+                    'Content-Type': 'application/json'
                 },
                 data: {
                     uniqueURL: uniqueURL,

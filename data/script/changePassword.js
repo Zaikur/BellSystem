@@ -15,11 +15,6 @@ $(document).ready(function() {
         var confirmPassword = $('#confirmPassword').val();
         var oldPassword = $('#oldPassword').val();
 
-        if (!checkServerTokenMatch) {
-            showLoginModal();
-            return;
-        }
-
         if (newPassword.length < 8) {
             $('#passwordStrengthError').text('Password must be at least 8 characters.');
             return;
@@ -32,7 +27,7 @@ $(document).ready(function() {
 
         checkServerTokenMatch(function(tokenMatches) {
             if (!tokenMatches) {
-                // If token doesn't match, show login modal and stop further execution
+                showLoginModal();
                 return;
             }
 

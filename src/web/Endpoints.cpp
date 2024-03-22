@@ -91,7 +91,6 @@ void setupEndpoints() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -112,7 +111,7 @@ void setupEndpoints() {
         server.send(200, "text/html", htmlContent);
     });
 
-    /*************************Login Page*************************************/
+    /*************************Authentication*************************************/
 
     server.on("/completeLogin", HTTP_POST, []() {
         if (server.hasArg("password")) {
@@ -131,8 +130,6 @@ void setupEndpoints() {
             server.send(400, "text/plain", "No password received");
         }
     });
-
-    /*************************Authentication*************************************/
 
     server.on("/auth", HTTP_GET, []() {
         String providedToken = server.header("Authorization");
@@ -155,7 +152,6 @@ void setupEndpoints() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -171,7 +167,6 @@ void setupEndpoints() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -287,7 +282,6 @@ void setupEndpoints() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
@@ -321,7 +315,6 @@ void setupEndpoints() {
 
         //No changes need to be made to the JS file, so send it as is
         server.streamFile(file, "text/javascript");
-        server.sendHeader("Cache-Control", "max-age=86400"); // Cache for 1 day to reduce server load
         file.close();
     });
 
