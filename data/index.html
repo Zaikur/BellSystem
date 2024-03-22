@@ -23,6 +23,17 @@
             background-color: #495057 !important;
             box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
         }
+        .login {
+            background-color: #495057;
+            color: #ffffff;
+            border: 1px solid #6c757d;
+        }
+        .login:focus {
+            background-color: #495057;
+            color: #ffffff;
+            border-color: #5cb85c;
+            box-shadow: none;
+        }
         .card-body {
             display: flex;
             flex-direction: column;
@@ -31,7 +42,7 @@
         .card-title {
             color: #17a2b8;
         }
-        .btn-success {
+        .testButton {
             width: 100%;
         }
         #loginButton {
@@ -87,7 +98,7 @@
                 <div class="card bg-dark text-white">
                     <div class="card-body">
                         <h5 class="card-title">Test Ring Functionality</h5>
-                        <button class="btn btn-success" id="testRingButton">Test Ring</button>
+                        <button class="btn btn-success testButton" id="testRingButton">Test Ring</button>
                     </div>
                 </div>
             </div>
@@ -130,10 +141,10 @@
                     You must be logged in to continue.
                     <form id="loginForm" class="mt-4">
                         <div class="form-group">
-                            <input type="password" id="password" class="form-control" placeholder="Password" required>
+                            <input type="password" id="password" class="form-control login" placeholder="Password" required>
                         </div>
-                        <button type="submit" class="btn btn-success btn-block">Login</button>
-                        <button type="button" class="btn btn-warning btn-block" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Login</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                     </form>
                 </div>
             </div>

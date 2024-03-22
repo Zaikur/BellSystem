@@ -20,16 +20,25 @@
             background-color: #212529 !important;
             border-bottom: 2px solid #495057;
         }
-        .form-control {
+        .login {
             background-color: #495057;
             color: #ffffff;
             border: 1px solid #6c757d;
         }
-        input {
+        .login:focus {
+            background-color: #495057;
+            color: #ffffff;
+            border-color: #5cb85c;
+            box-shadow: none;
+        }
+        .ring-time {
             max-width: 170px;
             text-align: center;
+            background-color: #495057;
+            color: #ffffff;
+            border: 1px solid #6c757d;
         }
-        .form-control:focus {
+        .ring-time:focus {
             background-color: #495057;
             color: #ffffff;
             border-color: #5cb85c;
@@ -112,10 +121,10 @@
                     You must be logged in to continue.
                     <form id="loginForm" class="mt-4">
                         <div class="form-group">
-                            <input type="password" id="password" class="form-control" placeholder="Password" required>
+                            <input type="password" id="password" class="form-control login" placeholder="Password" required>
                         </div>
-                        <button type="submit" class="btn btn-success btn-block">Login</button>
-                        <button type="button" class="btn btn-warning btn-block" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Login</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                     </form>
                 </div>
             </div>
