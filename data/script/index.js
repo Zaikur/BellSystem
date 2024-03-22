@@ -46,13 +46,28 @@ $(document).ready(function() {
     // This method will update the time ther server sent every second
     // Verify that the server is sending the correct time
     function updateTime() {
-        var now = new Date();
-        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        var timeString = new Intl.DateTimeFormat('en-US', options).format(now);
-        $('#time').text(timeString);
+        var initialTimeString = $('#time').text(); // Get the initial time string from the element
+        var initialTime = new Date(initialTimeString); // Convert it to a Date object
+    
+        // Function to add seconds to a Date object
+        function addSeconds(date, seconds) {
+            return new Date(date.getTime() + seconds * 1000);
+        }
+    
+        // Update the time by adding one second
+        function update() {
+            var updatedTime = addSeconds(initialTime, 1); // Add one second to the initial time
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            var timeString = new Intl.DateTimeFormat('en-US', options).format(updatedTime);
+            $('#time').text(timeString);
+    
+            initialTime = updatedTime; // Set the initialTime to the updated time for the next update
+        }
+    
+        // Call update every second
+        setInterval(update, 1000);
     }
-
-    setInterval(updateTime, 1000); // Update time every second
+    
 
     // This method will fetch the remaining ring times for today and update the countdown
     function fetchTodayRemainingRingTimes() {
@@ -156,6 +171,7 @@ $(document).ready(function() {
         $('#errorSection').text(message);
     }
 
+    updateTime(); // Update the time on the page
     fetchServerMessages(); // Fetch server messages when the page loads
     fetchTodayRemainingRingTimes(); // Fetch remaining ring times when the page loads
 
