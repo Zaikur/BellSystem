@@ -47,6 +47,11 @@ void setup() {
         Serial.println("Failed to initialize EEPROM");
     }
 
+    // Initialize schedule manager and relay manager objects
+    scheduleManager = ScheduleManager();
+    relayManager = RelayManager(relayPin);
+
+
     // Load settings from EEPROM
     deviceName = eepromManager.loadDeviceName();
     uniqueURL = eepromManager.loadUniqueURL();

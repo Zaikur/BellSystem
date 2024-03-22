@@ -50,7 +50,7 @@ private:
     const int uniqueURLAddr = 300;
     const int passwordAddr = 400;
     const int sessionTokenAddr = 500;
-    const int scheduleStartAddr = 600;
+    const int scheduleStartAddr = 2000;
 };
 
 #endif

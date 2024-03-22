@@ -19,15 +19,17 @@ extern RelayManager relayManager;
 class ScheduleManager {
     public:
         ScheduleManager();
-        bool saveSchedule(const String& jsonSchedule);
         String getScheduleString();
         String getTodayRemainingRingTimes();
-        DynamicJsonDocument getScheduleJson();
         void handleRing();
-        void updateSchedule(const String& jsonSchedule);
+        bool updateSchedule(const String& jsonSchedule);
     private:
         bool shouldRingNow();
+        JsonArray getRemainingRingTimes();
+        void sortScheduleTimes(DynamicJsonDocument& schedule);
         String dayOfWeekStr(int day);
         void loadScheduleFromEEPROM();
         DynamicJsonDocument currentSchedule;
+        bool validateSchedule(DynamicJsonDocument& schedule);
+        bool isValidTimeFormat(const String& time);
 };

@@ -75,8 +75,7 @@ void setupEndpoints() {
         }
 
         // Serialize JSON to String and save it
-        if (eepromManager.saveRingSchedule(schedule)) {
-            scheduleManager.updateSchedule(schedule);
+        if (scheduleManager.updateSchedule(schedule)) {
             server.send(200, "text/plain", "Schedule saved successfully");
         } else {
             server.send(500, "text/plain", "Failed to save schedule");
@@ -108,7 +107,7 @@ void setupEndpoints() {
         file.close();
 
         // Replace the placeholder with the device name
-        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+        htmlContent.replace("{{deviceName}}", deviceName);
 
         server.send(200, "text/html", htmlContent);
     });
@@ -191,6 +190,7 @@ void setupEndpoints() {
 
     server.on("/getTodayRemainingRingTimes", HTTP_GET, []() {
         String result = scheduleManager.getTodayRemainingRingTimes(); // Get the remaining ring times for today
+        Serial.println("Remaining ring times: " + result);
         server.send(200, "text/plain", result);
     });
 
@@ -212,7 +212,7 @@ void setupEndpoints() {
         file.close();
 
         // Replace the placeholder with the device name
-        htmlContent.replace("{{deviceName}}", eepromManager.loadDeviceName());
+        htmlContent.replace("{{deviceName}}", deviceName);
         htmlContent.replace("{{dateTime}}", timeManager.getDateTime());
 
         server.send(200, "text/html", htmlContent);

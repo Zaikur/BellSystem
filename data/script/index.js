@@ -67,7 +67,6 @@ $(document).ready(function() {
                 times = times.filter(function(timeStr) {
                     var todayStr = now.toISOString().split('T')[0]; // "YYYY-MM-DD"
                     var timeDate = new Date(todayStr + 'T' + timeStr + ':00');
-                    console.log(timeDate);
                     return now < timeDate;
                 });
 
@@ -101,8 +100,6 @@ $(document).ready(function() {
         window.countdownInterval = setInterval(function() {
             var now = new Date().getTime();
             var distance = nextRingDate - now;
-            console.log("Distance:", distance);
-            console.log("Next ring date:", nextRingDate);
 
             if (distance < 0) {
                 clearInterval(window.countdownInterval);
