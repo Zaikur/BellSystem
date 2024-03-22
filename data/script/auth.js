@@ -37,10 +37,11 @@ function getAuthToken() {
     return localStorage.getItem('authToken');
 }
 
-// This function will display a login modal
+// This function will display a login modal, and after it's displayed it will focus on the password input
 function showLoginModal() {
-    $('#loginModal').modal('show');
-    $('#password').focus();
+    $('#loginModal').modal('show').on('shown.bs.modal', function () {
+        $('#password').focus();
+    });
 }
 
 $(document).ready(function() {

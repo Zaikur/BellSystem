@@ -345,6 +345,18 @@ void setupEndpoints() {
         }
     });
 
+    /*************************Favicon*************************************/
+
+    server.on("/favicon.ico", HTTP_GET, []() {
+        File file = LittleFS.open("/favicon.ico", "r");
+        if (!file) {
+            Serial.println("Failed to open file for reading");
+            return;
+        }
+
+        server.streamFile(file, "image/x-icon");
+    });
+
     // Handle not found
     server.onNotFound([]() {
         server.send(404, "text/plain", "Not found");
