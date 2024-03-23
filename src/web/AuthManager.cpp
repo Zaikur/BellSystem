@@ -14,7 +14,7 @@ AuthManager::AuthManager() {
     _initialized = eepromManager.loadInitialized();
     String password = eepromManager.loadPassword();
 
-    if (!_initialized) {
+    if (_initialized) {
         // If the device is not initialized, generate a random password and save it
         _salt = generateSalt(16);
         _encryptedPassword = hashPasswordWithSalt("admin", _salt);

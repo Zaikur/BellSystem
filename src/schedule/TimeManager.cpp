@@ -13,8 +13,7 @@ TimeManager::TimeManager() {}
 // This method initializes the ezTime library and waits for the time to be synchronized
 void TimeManager::begin() {
     // Set the time zone to CST
-    //if (!myTimeZone.setCache(100)) 
-    if (!myTimeZone.setCache(700)) myTimeZone.setLocation("America/Chicago");
+    myTimeZone.setLocation("America/Chicago");
 
     //This function waits for the time to be synchronized from the NTP server
     waitForSync();
