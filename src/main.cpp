@@ -22,12 +22,13 @@ This file handles the main loop and setup of the program. It initializes the glo
 #include "web/AuthManager.h"
 
 // Pins used for reset trigger and ground
-#define RESET_TRIGGER_PIN D5 // Reset trigger pin
+#define RESET_TRIGGER_PIN 14 // Reset trigger pin (D5, GPIO 14)
 #define GROUND_PIN D6 // Ground pin
+#define DEBOUNCE_DELAY 500 // 500 milliseconds debounce delay
 
 // Global objects
 EEPROMLayoutManager eepromManager; // EEPROM manager object
-const int relayPin = 5; // Pin for the relay module (GPIO5) 
+const int relayPin = 5; // Pin for the relay module (D1, GPIO 5) 
 ESP8266WebServer server(80); // HTTP server object
 RelayManager relayManager(relayPin); // Relay manager object
 TimeManager timeManager; // Time manager object
@@ -39,17 +40,29 @@ String uniqueURL; // Unique URL for the device
 int ringDuration; // Ring duration in seconds
 unsigned long lastRingTime = 0; // Last time the bell rang
 const long checkInterval = 6000; // Interval to check if the bell should ring (1 minute)
-bool isButtonBeingPressed = false; // Flag to check if the button is being pressed
-unsigned long buttonPressedTime = 0; // Time the button was pressed
+
 
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT); // Set the built-in LED pin as an output
-    pinMode(RESET_TRIGGER_PIN, INPUT_PULLUP);
-    pinMode(GROUND_PIN, OUTPUT);
-    digitalWrite(GROUND_PIN, HIGH); // Keep it high normally
+    pinMode(RESET_TRIGGER_PIN, INPUT_PULLUP); // Set the reset trigger pin as an input
 
     Serial.begin(115200); // Start serial communication at 115200 baud
+
+    // Add a small delay to allow for any transient conditions to stabilize
+    delay(DEBOUNCE_DELAY);
+
+    // Check if the reset condition is met
+    // To reset the password to default, and clear WiFi credentials short GPIO 14 to ground WHILE pressing the reset button and hold for 1 second before releasing both.
+    if (digitalRead(RESET_TRIGGER_PIN) == LOW) { // Assuming active low; use HIGH for active high
+        Serial.println("Reset condition detected. Clearing settings...");
+
+        eepromManager.saveInitialized(false);   // Reset the password to default on reboot
+        eepromManager.saveResetWifi(true);       // Clear WiFi credentials on reboot
+
+        // Now perform the restart
+        ESP.restart();
+    }
 
     /********************************************************************************
      * Setup services and objects, and load settings from EEPROM
@@ -66,7 +79,8 @@ void setup() {
     authManager.initialize();
     relayManager = RelayManager(relayPin);
 
-
+    // See if we need to reset the WiFi credentials
+    bool resetWifi = eepromManager.loadResetWifi();
 
     // Load settings from EEPROM
     deviceName = eepromManager.loadDeviceName();
@@ -84,10 +98,22 @@ void setup() {
     }
 
     // Setup WiFi manager and connect to WiFi network if not already connected
+    // If resetWifi is true, start access point to connect to a new network
     WiFiManager wifiManager;
-    if (!wifiManager.autoConnect("BellSystemSetupAP")) {
-        ESP.restart();
-        delay(1000);
+
+    if (resetWifi) {
+        wifiManager.setConfigPortalTimeout(180);
+        if (!wifiManager.startConfigPortal("BellSystemSetupAP")) {
+            delay(1000);
+            ESP.restart();
+            delay(1000);
+        }
+        eepromManager.saveResetWifi(false);
+    } else {
+        if (!wifiManager.autoConnect("BellSystemSetupAP")) {
+            ESP.restart();
+            delay(1000);
+        }
     }
 
     // Setup mDNS responder and check if it was successful
@@ -110,25 +136,6 @@ void setup() {
 }
 
 void loop() {
-    // Logic to reset the wifi credentials and password
-    if (digitalRead(RESET_TRIGGER_PIN) == LOW) { // Button is pressed
-        if (!isButtonBeingPressed) { // If it's the start of the press
-            isButtonBeingPressed = true;
-            digitalWrite(LED_BUILTIN, LOW); // Turn off the LED
-            buttonPressedTime = millis();
-        } else if (millis() - buttonPressedTime > 5000) { // Button held for 5 seconds
-            Serial.println("Resetting WiFi credentials and reverting to defaults...");
-            eepromManager.saveInitialized(false);   // Reset the password to default on reboot
-            WiFiManager wifiManager;
-            wifiManager.resetSettings(); // Clear WiFi credentials
-            ESP.restart(); // Restart the ESP
-        }
-    } else {
-        isButtonBeingPressed = false; // Button not being pressed
-        buttonPressedTime = 0; // Reset button pressed time
-    }
-
-
     events();
 
     // Check if the bell should ring, every minute

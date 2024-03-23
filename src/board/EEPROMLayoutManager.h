@@ -31,6 +31,9 @@ public:
     bool saveInitialized(bool initialized);
     bool loadInitialized();
 
+    bool saveResetWifi(bool resetWifi);
+    bool loadResetWifi();
+
     bool saveUniqueURL(const String& url);
     String loadUniqueURL();
 
@@ -47,7 +50,7 @@ private:
     const int passwordAddr = 400;
     const int saltAddr = 500;
     const bool initializedAddr = 600;
-    // DoubleResetDetector start address is 700
+    const bool resetWifiAddr = 700;
     const int scheduleStartAddr = 2000;
 };
 

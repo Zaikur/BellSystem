@@ -124,6 +124,24 @@ bool EEPROMLayoutManager::loadInitialized() {
     }
 }
 
+bool EEPROMLayoutManager::saveResetWifi(bool enabled) {
+    if (enabled) {
+        saveInt(1, resetWifiAddr);
+    } else {
+        saveInt(0, resetWifiAddr);
+    }
+    return saveInt(enabled, resetWifiAddr);
+}
+
+bool EEPROMLayoutManager::loadResetWifi() {
+    int resetWifi = loadInt(resetWifiAddr);
+    if (resetWifi <= 0 || resetWifi > 1) {
+        return false; // Return false
+    } else {
+        return true; // Return true
+    }
+}
+
 /****************************Private methods****************************/
 bool EEPROMLayoutManager::saveString(const String& data, int startAddr) {
     unsigned int i;

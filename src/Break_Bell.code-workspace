@@ -17,6 +17,15 @@
 		}
 	],
 	"settings": {
-		"liveServer.settings.multiRootWorkspaceName": "BellSystem"
+		"liveServer.settings.multiRootWorkspaceName": "BellSystem",
+		"files.associations": {
+			"*.embeddedhtml": "html",
+			"*.tcc": "cpp",
+			"deque": "cpp",
+			"list": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"vector": "cpp"
+		}
 	}
 }
