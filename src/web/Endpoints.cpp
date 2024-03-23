@@ -258,17 +258,19 @@ void setupEndpoints() {
             Serial.print("Device name received: ");
             Serial.println(deviceName);
         }
-        if (server.hasArg("uniqueURL")) {
-            uniqueURL = server.arg("uniqueURL");
-            eepromManager.saveUniqueURL(uniqueURL);
-            Serial.print("Unique URL received: ");
-            Serial.println(uniqueURL);
-        }
         if (server.hasArg("ringDuration")) {
             ringDuration = server.arg("ringDuration").toInt();
             eepromManager.saveRingDuration(ringDuration);
             Serial.print("Ring duration received: ");
             Serial.println(ringDuration);
+        }
+        if (server.hasArg("uniqueURL")) {
+            uniqueURL = server.arg("uniqueURL");
+            eepromManager.saveUniqueURL(uniqueURL);
+            Serial.print("Unique URL received: ");
+            Serial.println(uniqueURL);
+            server.send(200, "text/plain", "URL saved successfully, device will restart to apply changes");
+            ESP.reset(); // Restart the ESP to apply the new unique URL
         }
 
         server.send(200, "text/plain", "Settings saved");

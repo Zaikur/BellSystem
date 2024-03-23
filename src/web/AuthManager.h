@@ -31,6 +31,7 @@ class AuthManager {
 
   public:
     AuthManager();
+    bool initialize();
     bool checkPassword(const String &password);
     bool updatePassword(const String &newPassword);
     String generateToken();

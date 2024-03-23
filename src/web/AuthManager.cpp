@@ -8,20 +8,27 @@ This file handles the authentication of the device. It encrypts the password and
 
 /*********************PUBLIC*******************/
 
-AuthManager::AuthManager() {
-    // initial encrypted password (should be set properly during initialization)
+AuthManager::AuthManager() {}
+
+bool AuthManager::initialize() {
     _salt = eepromManager.loadSalt();
     _initialized = eepromManager.loadInitialized();
-    String password = eepromManager.loadPassword();
+    _encryptedPassword = eepromManager.loadPassword();
+    Serial.println("Loaded password: " + _encryptedPassword);
+    Serial.println("Loaded salt: " + _salt);
+    Serial.println("Initialized: " + String(_initialized));
 
-    if (_initialized) {
+        if (!_initialized) {
         // If the device is not initialized, generate a random password and save it
         _salt = generateSalt(16);
         _encryptedPassword = hashPasswordWithSalt("admin", _salt);
         eepromManager.savePassword(_encryptedPassword);
         eepromManager.saveSalt(_salt);
-        eepromManager.saveInitialized(false);
+        eepromManager.saveInitialized(true);
+        _initialized = true;
     }
+
+    return true;
 }
 
 bool AuthManager::checkPassword(const String &password) {
@@ -41,6 +48,7 @@ String AuthManager::generateToken() {
     String tokenData = String(micros()) + String(random(0, INT32_MAX)) + _salt;
     _tokenTimestamp = millis();
     _currentToken = hashToken(tokenData);
+    Serial.println("Generated token: " + _currentToken);
     return _currentToken;
 }
 

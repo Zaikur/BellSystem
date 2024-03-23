@@ -46,7 +46,6 @@ bool EEPROMLayoutManager::saveRingDuration(int duration) {
 
 int EEPROMLayoutManager::loadRingDuration() {
     int duration = loadInt(ringDurationStartAddr);
-    Serial.println("Loaded ring duration: " + String(duration));
     if (duration == 0) {
         return 2; // Return the default ring duration
     } else if (duration > 10 || duration < 0) {
@@ -108,6 +107,11 @@ String EEPROMLayoutManager::loadSalt() {
 }
 
 bool EEPROMLayoutManager::saveInitialized(bool initialized) {
+    if (initialized) {
+        saveInt(1, initializedAddr);
+    } else {
+        saveInt(0, initializedAddr);
+    }
     return saveInt(initialized, initializedAddr);
 }
 
@@ -144,6 +148,7 @@ String EEPROMLayoutManager::loadString(int startAddr, int maxLen) {
 }
 
 bool EEPROMLayoutManager::saveInt(int value, int startAddr) {
+    Serial.println("Saving int: " + String(value));
     EEPROM.put(startAddr, value);
     return EEPROM.commit();
 }
