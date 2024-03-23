@@ -47,6 +47,7 @@ private:
     const int passwordAddr = 400;
     const int saltAddr = 500;
     const bool initializedAddr = 600;
+    // Time zone data saved at address 700 - 800
     const int scheduleStartAddr = 2000;
 };
 

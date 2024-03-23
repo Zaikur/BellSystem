@@ -71,7 +71,7 @@ String AuthManager::hashPasswordWithSalt(const String &password, const String &s
     br_sha256_out(&mc, hash);
 
     String result = "";
-    for (unsigned int i = 0; i < sizeof(hash); i++) {
+    for (size_t i = 0; i < sizeof(hash); i++) {
         if (hash[i] < 16) result += "0";
         result += String(hash[i], HEX);
     }
@@ -87,7 +87,7 @@ String AuthManager::hashToken(const String &data) {
     br_sha256_out(&mc, hash);
 
     String result;
-    for (unsigned int i = 0; i < sizeof(hash); i++) {
+    for (size_t i = 0; i < sizeof(hash); i++) {
         char buf[3];
         sprintf(buf, "%02x", (unsigned int)hash[i]);
         result += String(buf);

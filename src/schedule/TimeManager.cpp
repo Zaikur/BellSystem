@@ -12,12 +12,12 @@ TimeManager::TimeManager() {}
 
 // This method initializes the ezTime library and waits for the time to be synchronized
 void TimeManager::begin() {
-    //This function waits for the time to be synchronized from the NTP server
-    waitForSync();
-
     // Set the time zone to CST
     //if (!myTimeZone.setCache(100)) 
-    myTimeZone.setLocation("America/Chicago");
+    if (!myTimeZone.setCache(700)) myTimeZone.setLocation("America/Chicago");
+
+    //This function waits for the time to be synchronized from the NTP server
+    waitForSync();
 
     // Print the current time to the serial monitor
     Serial.println("Time: " + myTimeZone.dateTime("Y-m-d H:i:s"));
