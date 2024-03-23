@@ -16,6 +16,7 @@ Sending all necessary files and data to the client at once is not feasible, so t
 #include "schedule/TimeManager.h"
 #include "schedule/scheduleManager.h"
 #include "board/RelayManager.h"
+#include "web/AuthManager.h"
 
 // Global objects that are defined in main.cpp
 extern EEPROMLayoutManager eepromManager; // EEPROM manager object
@@ -24,6 +25,8 @@ extern ESP8266WebServer server; // HTTP server object
 extern RelayManager relayManager; // Relay manager object
 extern TimeManager timeManager; // Time manager object
 extern ScheduleManager scheduleManager; // Schedule manager object
+extern AuthManager authManager; // Authentication manager object
+
 
 extern String deviceName; // Device name
 extern String uniqueURL; // Unique URL for the device
@@ -49,7 +52,7 @@ void setupEndpoints() {
     server.on("/updateSchedule", HTTP_POST, []() {
         String providedToken = server.header("Authorization");
 
-        if (!eepromManager.checkSessionToken(providedToken)) {
+        if (!authManager.checkToken(providedToken)) {
             server.send(401, "text/plain", "Unauthorized");
             return;
         }
@@ -117,10 +120,9 @@ void setupEndpoints() {
         if (server.hasArg("password")) {
             Serial.println("Password received");
             String password = server.arg("password");
-            if (password == eepromManager.loadPassword()) {
+            if (authManager.checkPassword(password)) {
                 Serial.println("Password correct");
-                String token = eepromManager.generateRandomToken();
-                eepromManager.saveSessionToken(token);
+                String token = authManager.generateToken();
                 String jsonResponse = "{\"token\":\"" + token + "\"}";
                 server.send(200, "application/json", jsonResponse);
             } else {
@@ -134,7 +136,7 @@ void setupEndpoints() {
     server.on("/auth", HTTP_GET, []() {
         String providedToken = server.header("Authorization");
 
-        if (!eepromManager.checkSessionToken(providedToken)) {
+        if (!authManager.checkToken(providedToken)) {
             server.send(401, "text/plain", "Unauthorized");
             return;
         }
@@ -173,7 +175,7 @@ void setupEndpoints() {
     server.on("/ToggleRelay", HTTP_GET, []() {
         String providedToken = server.header("Authorization");
 
-        if (!eepromManager.checkSessionToken(providedToken)) {
+        if (!authManager.checkToken(providedToken)) {
             server.send(401, "text/plain", "Unauthorized");
             return;
         }
@@ -243,7 +245,7 @@ void setupEndpoints() {
         // Assuming the token is sent in the Authorization header
         String providedToken = server.header("Authorization");
 
-        if (!eepromManager.checkSessionToken(providedToken)) {
+        if (!authManager.checkToken(providedToken)) {
             // If the token check fails, respond with 401 Unauthorized
             server.send(401, "text/plain", "Unauthorized");
             return; // Stop further processing
@@ -322,21 +324,18 @@ void setupEndpoints() {
         Serial.println("ChangePassword called");
 
         String providedToken = server.header("Authorization");
-        if (!eepromManager.checkSessionToken(providedToken)) {
+        if (!authManager.checkToken(providedToken)) {
             server.send(401, "text/plain", "Unauthorized");
             return;
         }
 
         if (server.hasArg("OldPassword") && server.hasArg("NewPassword")) {
-            String oldPassword = server.arg("OldPassword");
-            String newPassword = server.arg("NewPassword");
-            String storedPassword = eepromManager.loadPassword();
-            oldPassword.trim();
-            newPassword.trim();
-
-            if (oldPassword == storedPassword) { 
-                eepromManager.savePassword(newPassword);
-                server.send(200, "text/plain", "Password changed successfully.");
+            if (authManager.checkPassword(server.arg("OldPassword"))) {
+                if (authManager.updatePassword(server.arg("NewPassword"))) {
+                    server.send(200, "text/plain", "Password changed successfully.");
+                } else {
+                    server.send(500, "text/plain", "Failed to save new password.");
+                }
             } else {
                 server.send(401, "text/plain", "Invalid old password.");
             }

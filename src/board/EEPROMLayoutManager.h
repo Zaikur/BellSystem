@@ -26,17 +26,13 @@ public:
 
     bool savePassword(const String& password);
     String loadPassword();
-    bool checkPassword(const String& password);
+    bool saveSalt(const String& salt);
+    String loadSalt();
+    bool saveInitialized(bool initialized);
+    bool loadInitialized();
 
     bool saveUniqueURL(const String& url);
     String loadUniqueURL();
-
-    // Token generation and storage
-    String generateRandomToken();
-    bool saveSessionToken(const String& token);
-    bool checkSessionToken(const String& token);
-    bool wipeSessionToken();
-
 
 private:
     size_t findEEPROMEnd();
@@ -49,7 +45,8 @@ private:
     const int deviceNameAddr = 200;
     const int uniqueURLAddr = 300;
     const int passwordAddr = 400;
-    const int sessionTokenAddr = 500;
+    const int saltAddr = 500;
+    const bool initializedAddr = 600;
     const int scheduleStartAddr = 2000;
 };
 

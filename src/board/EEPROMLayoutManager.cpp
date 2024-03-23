@@ -98,28 +98,27 @@ String EEPROMLayoutManager::loadPassword() {
     }
 }
 
-/*****************************Session token******************************/
-String EEPROMLayoutManager::generateRandomToken() {
-    String token = "";
-    for (int i = 0; i < 16; i++) {
-        token += (char)random(33, 126);
+bool EEPROMLayoutManager::saveSalt(const String& salt) {
+    return saveString(salt, saltAddr);
+}
+
+String EEPROMLayoutManager::loadSalt() {
+    String salt = loadString(saltAddr, 100);
+    return salt;
+}
+
+bool EEPROMLayoutManager::saveInitialized(bool initialized) {
+    return saveInt(initialized, initializedAddr);
+}
+
+bool EEPROMLayoutManager::loadInitialized() {
+    int initialized = loadInt(initializedAddr);
+    if (initialized <= 0 || initialized > 1) {
+        return false; // Return false if the device is not initialized
+    } else {
+        return true; // Return true if the device is initialized
     }
-    return token;
 }
-
-bool EEPROMLayoutManager::saveSessionToken(const String& token) {
-    return saveString(token, sessionTokenAddr);
-}
-
-bool EEPROMLayoutManager::checkSessionToken(const String& token) {
-    return token == loadString(sessionTokenAddr, 100);
-}
-
-bool EEPROMLayoutManager::wipeSessionToken() {
-    return saveString("", sessionTokenAddr);
-}
-
-
 
 /****************************Private methods****************************/
 bool EEPROMLayoutManager::saveString(const String& data, int startAddr) {

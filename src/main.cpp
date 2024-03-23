@@ -19,6 +19,7 @@ This file handles the main loop and setup of the program. It initializes the glo
 #include "schedule/scheduleManager.h"
 #include "board/RelayManager.h"
 #include "web/Endpoints.h"
+#include "web/AuthManager.h"
 
 // Global objects
 EEPROMLayoutManager eepromManager; // EEPROM manager object
@@ -27,6 +28,7 @@ ESP8266WebServer server(80); // HTTP server object
 RelayManager relayManager(relayPin); // Relay manager object
 TimeManager timeManager; // Time manager object
 ScheduleManager scheduleManager; // Schedule manager object
+AuthManager authManager; // Authentication manager object
 
 String deviceName; // Device name
 String uniqueURL; // Unique URL for the device
