@@ -83,8 +83,11 @@ $(document).ready(function() {
                 $('#loginModal').modal('hide');
                 updateAuthButton();
             },
-            error: function() {
-                $('#loginMessage').text('Login failed. Please try again.');
+            error: function(xhr, status, error) {
+                if (xhr.status == 400 || xhr.status == 401) {
+                    $('#wrongPassword').text('Invalid password. Please try again.');
+                    $('#password').focus();
+                }
             }
         });
     });

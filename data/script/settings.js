@@ -46,13 +46,20 @@ $(document).ready(function() {
                     'Authorization': getAuthToken(),
                     'Content-Type': 'application/json'
                 },
-                data: {
+                data: JSON.stringify({
                     uniqueURL: uniqueURL,
                     deviceName: deviceName,
                     ringDuration: ringDuration
-                },
+                }),
                 success: function(response) {
-                    // Handle success
+                    if (response == "URL saved successfully, device will restart to apply changes") {
+                        alert("Settings updated successfully! Device will restart to apply changes. \n" +
+                                "Your new URL will be: " + uniqueURL + ".local \n" + 
+                                "Redirecting to new url in 10 seconds...");
+                        setTimeout(function() {
+                            window.location.href = "http://" + uniqueURL + ".local";
+                        }, 10000);
+                    }
                     alert("Settings updated successfully!");
                 },
                 error: function(xhr, status, error) {

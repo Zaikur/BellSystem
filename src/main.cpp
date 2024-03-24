@@ -44,21 +44,22 @@ const long checkInterval = 6000; // Interval to check if the bell should ring (1
 
 
 void setup() {
-    pinMode(LED_BUILTIN, OUTPUT); // Set the built-in LED pin as an output
     pinMode(RESET_TRIGGER_PIN, INPUT_PULLUP); // Set the reset trigger pin as an input
 
     Serial.begin(115200); // Start serial communication at 115200 baud
 
-    // Add a small delay to allow for any transient conditions to stabilize
+    // Add a small delay to allow for any conditions to stabilize
     delay(DEBOUNCE_DELAY);
 
     // Check if the reset condition is met
     // To reset the password to default, and clear WiFi credentials short GPIO 14 to ground WHILE pressing the reset button and hold for 1 second before releasing both.
-    if (digitalRead(RESET_TRIGGER_PIN) == LOW) { // Assuming active low; use HIGH for active high
+    if (digitalRead(RESET_TRIGGER_PIN) == LOW) {
         Serial.println("Reset condition detected. Clearing settings...");
 
         eepromManager.saveInitialized(false);   // Reset the password to default on reboot
-        eepromManager.saveResetWifi(true);       // Clear WiFi credentials on reboot
+        eepromManager.saveDeviceName("bellsystem"); // Reset the device name to default
+        eepromManager.saveUniqueURL("bellsystem"); // Reset the unique URL to default
+        eepromManager.saveRingDuration(2); // Reset the ring duration to default
 
         // Now perform the restart
         ESP.restart();
@@ -79,9 +80,6 @@ void setup() {
     authManager.initialize();
     relayManager = RelayManager(relayPin);
 
-    // See if we need to reset the WiFi credentials
-    bool resetWifi = eepromManager.loadResetWifi();
-
     // Load settings from EEPROM
     deviceName = eepromManager.loadDeviceName();
     uniqueURL = eepromManager.loadUniqueURL();
@@ -98,22 +96,11 @@ void setup() {
     }
 
     // Setup WiFi manager and connect to WiFi network if not already connected
-    // If resetWifi is true, start access point to connect to a new network
     WiFiManager wifiManager;
 
-    if (resetWifi) {
-        wifiManager.setConfigPortalTimeout(180);
-        if (!wifiManager.startConfigPortal("BellSystemSetupAP")) {
-            delay(1000);
-            ESP.restart();
-            delay(1000);
-        }
-        eepromManager.saveResetWifi(false);
-    } else {
-        if (!wifiManager.autoConnect("BellSystemSetupAP")) {
-            ESP.restart();
-            delay(1000);
-        }
+    if (!wifiManager.autoConnect("BellSystemSetupAP")) {
+        ESP.restart();
+        delay(1000);
     }
 
     // Setup mDNS responder and check if it was successful

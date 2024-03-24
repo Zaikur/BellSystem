@@ -241,40 +241,64 @@ void setupEndpoints() {
         server.send(200, "text/html", htmlContent);
     });
 
-    server.on("/saveSettings", HTTP_POST, []() {
-        // Assuming the token is sent in the Authorization header
-        String providedToken = server.header("Authorization");
+#include <ArduinoJson.h> // Make sure this include is at the top of your file
 
-        if (!authManager.checkToken(providedToken)) {
-            // If the token check fails, respond with 401 Unauthorized
-            server.send(401, "text/plain", "Unauthorized");
-            return; // Stop further processing
-        }
+server.on("/saveSettings", HTTP_POST, []() {
+    // Assuming the token is sent in the Authorization header
+    String providedToken = server.header("Authorization");
 
-        Serial.println("SaveSettings called");
-        if (server.hasArg("deviceName")) {
-            deviceName = server.arg("deviceName");
-            eepromManager.saveDeviceName(deviceName);
-            Serial.print("Device name received: ");
-            Serial.println(deviceName);
-        }
-        if (server.hasArg("ringDuration")) {
-            ringDuration = server.arg("ringDuration").toInt();
-            eepromManager.saveRingDuration(ringDuration);
-            Serial.print("Ring duration received: ");
-            Serial.println(ringDuration);
-        }
-        if (server.hasArg("uniqueURL")) {
-            uniqueURL = server.arg("uniqueURL");
+    if (!authManager.checkToken(providedToken)) {
+        // If the token check fails, respond with 401 Unauthorized
+        server.send(401, "text/plain", "Unauthorized");
+        return; // Stop further processing
+    }
+
+    // Read the raw POST data
+    String requestBody = server.arg("plain");
+    
+    // Use ArduinoJson to parse the JSON payload
+    DynamicJsonDocument doc(1024);
+    DeserializationError error = deserializeJson(doc, requestBody);
+    
+    if (error) {
+        server.send(500, "text/plain", "Error parsing JSON!");
+        return;
+    }
+
+    Serial.println("SaveSettings called");
+
+    // Extract and save the device name
+    if (doc.containsKey("deviceName")) {
+        deviceName = doc["deviceName"].as<String>();
+        eepromManager.saveDeviceName(deviceName);
+        Serial.print("Device name received: ");
+        Serial.println(deviceName);
+    }
+
+    // Extract and save the ring duration
+    if (doc.containsKey("ringDuration")) {
+        ringDuration = doc["ringDuration"];
+        eepromManager.saveRingDuration(ringDuration);
+        Serial.print("Ring duration received: ");
+        Serial.println(ringDuration);
+    }
+
+    // Extract, compare, and potentially save the unique URL
+    if (doc.containsKey("uniqueURL")) {
+        uniqueURL = doc["uniqueURL"].as<String>();
+        if (uniqueURL != eepromManager.loadUniqueURL()) {
             eepromManager.saveUniqueURL(uniqueURL);
-            Serial.print("Unique URL received: ");
-            Serial.println(uniqueURL);
+            Serial.println("Unique URL updated: " + uniqueURL);
             server.send(200, "text/plain", "URL saved successfully, device will restart to apply changes");
-            ESP.reset(); // Restart the ESP to apply the new unique URL
+            delay(1000); // Short delay before restart
+            ESP.restart();
+            return;
         }
+    }
 
-        server.send(200, "text/plain", "Settings saved");
-    });
+    server.send(200, "text/plain", "Settings saved successfully.");
+});
+
 
         server.on("/script/settings.js", HTTP_GET, []() {
         String jsContent;

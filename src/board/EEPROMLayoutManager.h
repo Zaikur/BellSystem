@@ -33,6 +33,8 @@ public:
 
     bool saveResetWifi(bool resetWifi);
     bool loadResetWifi();
+    bool saveVerifyReset(bool verifyReset);
+    bool loadVerifyReset();
 
     bool saveUniqueURL(const String& url);
     String loadUniqueURL();
@@ -50,7 +52,6 @@ private:
     const int passwordAddr = 400;
     const int saltAddr = 500;
     const bool initializedAddr = 600;
-    const bool resetWifiAddr = 700;
     const int scheduleStartAddr = 2000;
 };
 

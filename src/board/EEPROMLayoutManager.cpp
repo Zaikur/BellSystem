@@ -107,39 +107,12 @@ String EEPROMLayoutManager::loadSalt() {
 }
 
 bool EEPROMLayoutManager::saveInitialized(bool initialized) {
-    if (initialized) {
-        saveInt(1, initializedAddr);
-    } else {
-        saveInt(0, initializedAddr);
-    }
-    return saveInt(initialized, initializedAddr);
+    return saveInt(initialized ? 1 : 0, initializedAddr);
 }
 
 bool EEPROMLayoutManager::loadInitialized() {
     int initialized = loadInt(initializedAddr);
-    if (initialized <= 0 || initialized > 1) {
-        return false; // Return false if the device is not initialized
-    } else {
-        return true; // Return true if the device is initialized
-    }
-}
-
-bool EEPROMLayoutManager::saveResetWifi(bool enabled) {
-    if (enabled) {
-        saveInt(1, resetWifiAddr);
-    } else {
-        saveInt(0, resetWifiAddr);
-    }
-    return saveInt(enabled, resetWifiAddr);
-}
-
-bool EEPROMLayoutManager::loadResetWifi() {
-    int resetWifi = loadInt(resetWifiAddr);
-    if (resetWifi <= 0 || resetWifi > 1) {
-        return false; // Return false
-    } else {
-        return true; // Return true
-    }
+    return initialized == 1;  // Return true if stored value is 1
 }
 
 /****************************Private methods****************************/
