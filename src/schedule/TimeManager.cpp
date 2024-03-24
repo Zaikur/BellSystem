@@ -12,11 +12,15 @@ TimeManager::TimeManager() {}
 
 // This method initializes the ezTime library and waits for the time to be synchronized
 void TimeManager::begin() {
-    // Set the time zone to CST
-    myTimeZone.setLocation("America/Chicago");
+    // Set the time zone to CST, using Posix format which contains the daylight savings time rules
+    myTimeZone.setPosix("CST6CDT,M3.2.0,M11.1.0");
 
     //This function waits for the time to be synchronized from the NTP server
-    waitForSync();
+    if (waitForSync()) {
+        eepromManager.addSystemMessage("Time synchronized successfully.");
+    } else {
+        eepromManager.addSystemMessage("Time synchronization failed.");
+    }
 
     // Print the current time to the serial monitor
     Serial.println("Time: " + myTimeZone.dateTime("Y-m-d H:i:s"));

@@ -40,6 +40,7 @@ String uniqueURL; // Unique URL for the device
 int ringDuration; // Ring duration in seconds
 unsigned long lastRingTime = 0; // Last time the bell rang
 const long checkInterval = 6000; // Interval to check if the bell should ring (1 minute)
+DynamicJsonDocument systemMessages(1024); // Array to store system messages
 
 
 
@@ -48,6 +49,9 @@ void setup() {
 
     Serial.begin(115200); // Start serial communication at 115200 baud
 
+    // Initialize the system messages array
+    systemMessages.to<JsonArray>();
+
     // Add a small delay to allow for any conditions to stabilize
     delay(DEBOUNCE_DELAY);
 
@@ -55,6 +59,8 @@ void setup() {
     // To reset the password to default, and clear WiFi credentials short GPIO 14 to ground WHILE pressing the reset button and hold for 1 second before releasing both.
     if (digitalRead(RESET_TRIGGER_PIN) == LOW) {
         Serial.println("Reset condition detected. Clearing settings...");
+
+        eepromManager.addSystemMessage("Reset condition detected. Default settings restored. Please select a new Password, Device Name, and Unique URL.");
 
         eepromManager.saveInitialized(false);   // Reset the password to default on reboot
         eepromManager.saveDeviceName("bellsystem"); // Reset the device name to default
@@ -71,7 +77,9 @@ void setup() {
 
     // Initialize EEPROM with 4096 bytes and check if it was successful
     if(!eepromManager.begin(4096)) {
-        Serial.println("Failed to initialize EEPROM");
+        eepromManager.addSystemMessage("EEPROM initialization failed.");
+    } else {
+        eepromManager.addSystemMessage("EEPROM initialized successfully");
     }
 
 
@@ -91,8 +99,10 @@ void setup() {
 
     // Initialize LittleFS file system and check if it was successful
     if (!LittleFS.begin()) {
-        Serial.println("An Error has occurred while mounting LittleFS");
+        eepromManager.addSystemMessage("LittleFS initialization failed.");
         return;
+    } else {
+        eepromManager.addSystemMessage("LittleFS mounted successfully");
     }
 
     // Setup WiFi manager and connect to WiFi network if not already connected
@@ -106,9 +116,13 @@ void setup() {
     // Setup mDNS responder and check if it was successful
     // Set the unique URL to the device name set by the user (default is bellsystem)
     if (!MDNS.begin(uniqueURL)) { 
-        Serial.println("Error setting up MDNS responder!");
+        char buffer[100];
+        snprintf(buffer, sizeof(buffer), "MDNS responder failed to start. IP: %s", WiFi.localIP().toString().c_str());
+        systemMessages.add(buffer);
     } else {
-        Serial.println("mDNS responder started:" + uniqueURL);
+        char buffer[100]; // Adjust size as needed
+        snprintf(buffer, sizeof(buffer), "MDNS started with URL: %s.local", uniqueURL.c_str());
+        systemMessages.add(buffer);
         MDNS.addService("http", "tcp", 80);
     }
 
@@ -124,6 +138,7 @@ void setup() {
 
 void loop() {
     events();
+    MDNS.update();
 
     // Check if the bell should ring, every minute
     if (minuteChanged()) {
@@ -132,7 +147,6 @@ void loop() {
 
 
     server.handleClient();
-    MDNS.update();
 }
 
 

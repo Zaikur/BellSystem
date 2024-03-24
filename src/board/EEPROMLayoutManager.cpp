@@ -16,12 +16,35 @@ bool EEPROMLayoutManager::begin(size_t size) {
     return true;
 }
 
+/****************************System messages****************************/
+
+/**
+ * The function `addSystemMessage` adds a new message to an array, removing the first element if the
+ * array is already full.
+ * 
+ * @param message The `message` parameter is a pointer to a constant character array (string) that
+ * contains the system message to be added to the `systemMessages` array in the `EEPROMLayoutManager`
+ * class.
+ */
+void EEPROMLayoutManager::addSystemMessage(const char* message) {
+    // Directly access the JsonArray within systemMessages
+    JsonArray messagesArray = systemMessages.as<JsonArray>();
+
+    // Check if the array is full
+    if (messagesArray.size() >= 15) {
+        // Remove the first element
+        messagesArray.remove(0);
+    }
+
+    // Add the new message
+    messagesArray.add(message);
+    Serial.println("System Messages " + String(messagesArray.size()));
+}
 
 
 /****************************Ring schedule****************************/
 bool EEPROMLayoutManager::saveRingSchedule(const String& schedule) {
     bool saveSuccess = saveString(schedule, scheduleStartAddr);
-    // Immediately read back for verification
     return saveSuccess;
 }
 

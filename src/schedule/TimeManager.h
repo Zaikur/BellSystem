@@ -10,6 +10,9 @@ This file handles time synchronization with NTP, keeping track of the current ti
 #include <Arduino.h>
 #include <ezTime.h>
 #include <WiFiUdp.h>
+#include "board/EEPROMLayoutManager.h"
+
+extern EEPROMLayoutManager eepromManager;
 
 class TimeManager {
 public:

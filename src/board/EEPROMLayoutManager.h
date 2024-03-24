@@ -9,9 +9,14 @@ This file handles EEPROM management
 
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <ArduinoJson.h>
+
+extern DynamicJsonDocument systemMessages;
 
 class EEPROMLayoutManager {
 public:
+    void addSystemMessage(const char* message);
+
     EEPROMLayoutManager();
     bool begin(size_t size);
     bool saveRingSchedule(const String& schedule);
@@ -40,7 +45,6 @@ public:
     String loadUniqueURL();
 
 private:
-    size_t findEEPROMEnd();
     bool saveString(const String& data, int startAddr);
     String loadString(int startAddr, int maxLen);
     bool saveInt(int value, int startAddr);

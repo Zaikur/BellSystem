@@ -134,41 +134,22 @@ $(document).ready(function() {
         $.ajax({
             url: '/getServerMessages',
             type: 'GET',
-            success: function(response) {
-                // Server messages are separated by new lines
-                var messages = response.split('\n');
-                updateMessageList(messages);
+            dataType: 'json',
+            success: function(messages) { // Directly receive the array of messages
+                var messageList = $('#messageList');
+                messageList.empty(); // Clear the list before adding new messages
+    
+                messages.forEach(function(message) {
+                    var listItem = $('<li class="list-group-item bg-dark text-white"></li>').text(message);
+                    messageList.append(listItem);
+                });
             },
             error: function(xhr, status, error) {
                 console.error("Failed to fetch server messages:", error);
-                displayError("Failed to load system messages.");
+                $('#messageList').empty() // Clear the list
+                                .append($('<li class="list-group-item bg-dark text-white"></li>').text("Failed to load system messages."));
             }
         });
-    }
-
-    // This method will request status messages from the server
-    function updateMessageList(messages) {
-        var $messageList = $('#messageList');
-        $messageList.empty(); // Clear existing messages
-        
-        messages.forEach(function(message) {
-            if (message.trim().length > 0) { // Ensure the message is not just empty spaces
-                var $li = $('<li class="list-group-item bg-dark text-white"></li>');
-                $li.text(message);
-                $messageList.append($li);
-            }
-        });
-
-        if (messages.length === 0 || (messages.length === 1 && messages[0].trim().length === 0)) {
-            // If no messages or only empty message
-            var $li = $('<li class="list-group-item bg-dark text-white">No system messages.</li>');
-            $messageList.append($li);
-        }
-    }
-
-    // This method will display any error messages from the server
-    function displayError(message) {
-        $('#errorSection').text(message);
     }
 
     updateTime(); // Update the time on the page

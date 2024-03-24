@@ -18,7 +18,7 @@ bool AuthManager::initialize() {
     Serial.println("Loaded salt: " + _salt);
     Serial.println("Initialized: " + String(_initialized));
 
-        if (!_initialized) {
+    if (!_initialized) {
         // If the device is not initialized, generate a random password and save it
         _salt = generateSalt(16);
         _encryptedPassword = hashPasswordWithSalt("admin", _salt);
@@ -26,6 +26,10 @@ bool AuthManager::initialize() {
         eepromManager.saveSalt(_salt);
         eepromManager.saveInitialized(true);
         _initialized = true;
+    }
+
+    if (checkPassword("admin")) {
+        eepromManager.addSystemMessage("Default password detected. Change the default password as soon as possible.");
     }
 
     return true;

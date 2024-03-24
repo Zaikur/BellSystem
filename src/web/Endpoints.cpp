@@ -192,9 +192,10 @@ void setupEndpoints() {
     });
 
     server.on("/getServerMessages", HTTP_GET, []() {
-        // Get the server messages from EEPROM********************************************************
-        String serverMessages = "";
-        server.send(200, "text/plain", serverMessages);
+        String output;
+        serializeJson(systemMessages, output);
+        Serial.println("System messages: " + output);
+        server.send(200, "application/json", output);
     });
 
     server.on("/", HTTP_GET, []() {
