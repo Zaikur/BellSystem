@@ -20,7 +20,6 @@ public:
     EEPROMLayoutManager();
     bool begin(size_t size);
     bool saveRingSchedule(const String& schedule);
-    bool wipeSavedSchedule();
     String loadRingSchedule();
 
     bool saveRingDuration(int duration);

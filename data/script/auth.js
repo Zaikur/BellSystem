@@ -4,27 +4,32 @@ Quinton Nelson
 this file contains JQuery that authenticates the user and handles the login/logout button
 */
 
-// This function will check if the client-side token matches the server-side token
+/**
+ * The function `checkServerTokenMatch` verifies a server token by sending it to the server and
+ * invoking a callback with the result.
+ * @param callback - The `callback` parameter in the `checkServerTokenMatch` function is a function
+ * that will be invoked with a boolean argument indicating whether the server token matches or not. The
+ * callback function is called with `true` if the token verification is successful, and `false` if the
+ * token verification fails.
+ * @returns The `checkServerTokenMatch` function is not explicitly returning any value. It is making an
+ * asynchronous AJAX request to verify a token and then invoking the provided callback function with
+ * either `true` or `false` based on the token verification result.
+ */
 function checkServerTokenMatch(callback) {
     const authToken = getAuthToken();
     if (!authToken) {
-        console.log("No auth token found.");
         callback(false); // Immediately invoke callback with false
         return;
     }
-
-    console.log("Sending token for verification: ", authToken);
 
     $.ajax({
         url: '/auth',
         type: 'GET',
         headers: { 'Authorization': authToken },
         success: function(response) {
-            console.log("Token verification success.");
             callback(true); // Token matches, invoke callback with true
         },
         error: function(xhr) {
-            console.log("Token verification failed. Status: ", xhr.status);
             // Removed the second callback call in the error handler to prevent double invocation
             callback(false); // Token does not match, invoke callback with false
         }
@@ -32,12 +37,19 @@ function checkServerTokenMatch(callback) {
 }
 
 
-// This function returns the token from the browser's local storage
+/**
+ * The function `getAuthToken` retrieves the authentication token from the localStorage.
+ * @returns The function `getAuthToken` is returning the value stored in the `authToken` key in the
+ * localStorage.
+ */
 function getAuthToken() {
     return localStorage.getItem('authToken');
 }
 
-// This function will display a login modal, and after it's displayed it will focus on the password input
+/**
+ * The function `showLoginModal` displays a login modal and focuses on the password input field when
+ * the modal is shown.
+ */
 function showLoginModal() {
     $('#loginModal').modal('show').on('shown.bs.modal', function () {
         $('#password').focus();

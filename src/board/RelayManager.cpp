@@ -14,7 +14,6 @@ RelayManager::RelayManager(int pin) : relayPin(pin) {
 // This method activates the relay for a given duration, then deactivates it
 // Duration pulled from global variable ringDuration
 void RelayManager::activateRelay() {
-    Serial.println("Activating relay");
     digitalWrite(relayPin, HIGH);
     delay(ringDuration * 1000);
     digitalWrite(relayPin, LOW);

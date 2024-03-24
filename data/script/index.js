@@ -2,13 +2,7 @@
 Quinton Nelson
 3/15/2024
 this file contains JQuery for the index page
-Contains the following functions:
-- updateTime: updates the time on the page every second
-- fetchTodayRemainingRingTimes: fetches the remaining ring times for today and updates the countdown
-- updateCountdown: updates the countdown to the next bell ring every second
-- fetchServerMessages: requests status messages from the server
-- updateMessageList: updates the list of server messages
-- displayError: displays any error messages from the server
+Contains functions to update the time on the page, fetch remaining ring times, and fetch server messages
 */
 
 
@@ -43,8 +37,10 @@ $(document).ready(function() {
         });
     });
 
-    // This method will update the time ther server sent every second
-    // Verify that the server is sending the correct time
+    /**
+     * The function `updateTime` retrieves an initial time string from an element, converts it to a Date
+     * object, and then continuously updates the time displayed by adding one second at a time.
+     */
     function updateTime() {
         var initialTimeString = $('#time').text(); // Get the initial time string from the element
         var initialTime = new Date(initialTimeString); // Convert it to a Date object
@@ -69,7 +65,14 @@ $(document).ready(function() {
     }
     
 
-    // This method will fetch the remaining ring times for today and update the countdown
+    /**
+     * The function fetches today's remaining ring times, filters out past times, and initiates a countdown
+     * to the next ring time if available.
+     * @returns The `fetchTodayRemainingRingTimes` function makes an AJAX request to the server to get the
+     * remaining ring times for today. The response is expected to be a comma-separated list of times in
+     * the format "HH:MM,HH:MM,...". The function then filters out past times, sorts the remaining times,
+     * and starts a countdown to the next ring time if there are any remaining times. If
+     */
     function fetchTodayRemainingRingTimes() {
         $.ajax({
             url: '/getTodayRemainingRingTimes',
@@ -97,15 +100,21 @@ $(document).ready(function() {
         });
     }
 
-    // This method will update the countdown to next bell ring every second
-    // Once countdown is reached, fetch new ring times and update countdown
+    /**
+     * The function `updateCountdown` sets up a countdown interval to display the time remaining until a
+     * specified next ring time.
+     * @param nextRingTime - The `nextRingTime` parameter in the `updateCountdown` function represents the
+     * time of the next ring in the format "HH:MM" (hours and minutes). It is used to calculate the
+     * countdown until that specific time.
+     * @returns The `updateCountdown` function returns nothing explicitly. It sets up an interval to update
+     * a countdown timer displayed on the page until a certain time is reached, at which point it fetches
+     * new times and updates the countdown.
+     */
     function updateCountdown(nextRingTime) {
         // Clear existing countdown interval if one exists
         if (window.countdownInterval) {
             clearInterval(window.countdownInterval);
         }
-
-        console.log("Next ring time:", nextRingTime);
 
         // Convert next ring time to a Date object
         var now = new Date();
@@ -130,6 +139,10 @@ $(document).ready(function() {
         }, 1000);
     }
 
+    /**
+     * The function `fetchServerMessages` makes an AJAX request to fetch server messages and displays them
+     * in a list on the webpage, handling errors appropriately.
+     */
     function fetchServerMessages() {
         $.ajax({
             url: '/getServerMessages',

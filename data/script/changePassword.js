@@ -25,6 +25,7 @@ $(document).ready(function() {
             return; // Stop submission
         }
 
+        // Check if the server token matches
         checkServerTokenMatch(function(tokenMatches) {
             if (!tokenMatches) {
                 showLoginModal();
@@ -45,7 +46,7 @@ $(document).ready(function() {
                 success: function(response) {
                     alert("Password changed successfully. Please log back in.");
                     localStorage.removeItem('authToken');
-                    showLoginModal(); // Redirect after successful password change
+                    showLoginModal(); // Show login model to login again
                 },
                 error: function(xhr) {
                     alert("Error changing password.");

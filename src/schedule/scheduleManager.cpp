@@ -13,23 +13,33 @@ ScheduleManager::ScheduleManager() : currentSchedule(1024) {
     loadScheduleFromEEPROM();
 }
 
-// This method saves the schedule to EEPROM and updates the currentSchedule object
-// Returns true if the schedule was saved successfully
+
+/**
+ * The function `updateSchedule` in the `ScheduleManager` class updates and saves a schedule by
+ * deserializing, validating, sorting, and serializing JSON data.
+ * 
+ * @param jsonSchedule The `jsonSchedule` parameter in the `updateSchedule` function is a JSON string
+ * that represents a schedule. This JSON string is deserialized into a `DynamicJsonDocument` object
+ * named `tempSchedule` for further processing. The function then validates the structure and content
+ * of the schedule, sorts the schedule
+ * 
+ * @return The `updateSchedule` function returns a boolean value. It returns `true` if the schedule
+ * update was successful and the updated schedule was saved to EEPROM, and it returns `false` if there
+ * was an error during the process such as failure to deserialize the JSON string, validation failure,
+ * or failure to save the updated schedule to EEPROM.
+ */
 bool ScheduleManager::updateSchedule(const String& jsonSchedule) {
     DynamicJsonDocument tempSchedule(1024); // Temp schedule object (used for sorting times)
 
     // Deserialize the JSON string into the tempSchedule object
     auto error = deserializeJson(tempSchedule, jsonSchedule);
     if (error) {
-        Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error.c_str());
         return false; // Indicate failure to update schedule
     }
 
     
     // Validate the schedule structure and content
     if (!validateSchedule(tempSchedule)) {
-        Serial.println("Schedule validation failed.");
         return false; // Schedule is not as expected, indicate failure
     }
 
@@ -47,22 +57,33 @@ bool ScheduleManager::updateSchedule(const String& jsonSchedule) {
 }
 
 
-// This method returns the current schedule as a string
+/**
+ * The `getScheduleString` function in the `ScheduleManager` class returns the current schedule as a
+ * string.
+ * 
+ * @return A string representation of the current schedule is being returned.
+ */
 String ScheduleManager::getScheduleString() {
     return currentSchedule.as<String>();
 }
 
-// This method checks if the bell should ring and activates the relay if it should
+/**
+ * The `handleRing` function checks if the bell should ring and activates the relay if necessary.
+ */
 void ScheduleManager::handleRing() {
-    Serial.println("Checking if the bell should ring");
     if (shouldRingNow()) {
-        Serial.println("Ringing the bell");
         relayManager.activateRelay();
     }
 }
 
-// This method checks ring times for the current day
-// Returns an array of times for the current day that are still upcoming
+/**
+ * The function `getTodayRemainingRingTimes` returns a string containing the remaining ring times for
+ * today in a comma-separated format or "No more rings today" if there are none.
+ * 
+ * @return The `getTodayRemainingRingTimes` function returns a string that contains the remaining ring
+ * times for today. If there are no more ring times remaining for the day, it returns the string "No
+ * more rings today".
+ */
 String ScheduleManager::getTodayRemainingRingTimes() {
     JsonArray remainingTimes = getRemainingRingTimes();
     String result;
@@ -77,8 +98,15 @@ String ScheduleManager::getTodayRemainingRingTimes() {
 
 /****************PRIVATE******************/
 
-// This method checks if the bell should ring at the current time
-// Returns true if the bell should ring now
+/**
+ * The function `shouldRingNow` checks if the current time matches any scheduled time for ringing a
+ * bell based on the day of the week.
+ * 
+ * @return The function `shouldRingNow()` returns a boolean value. It returns `true` if the current
+ * time matches any of the scheduled times for the day in the `currentSchedule`, indicating that the
+ * bell should ring now. Otherwise, it returns `false`, indicating that there is no scheduled ringing
+ * for the current minute.
+ */
 bool ScheduleManager::shouldRingNow() {
     String currentTime = timeManager.getTime(); // "HH:MM" format
     String today = dayOfWeekStr(timeManager.getDayOfWeek());
@@ -98,8 +126,13 @@ bool ScheduleManager::shouldRingNow() {
 }
 
 
-// This method gets the current time, day of the week, and compares it to the schedule
-// Returns an array of times for the current day that are still upcoming
+/**
+ * The function `getRemainingRingTimes` retrieves the remaining ring times for the current day based on
+ * the current time.
+ * 
+ * @return A JsonArray containing the remaining ring times for the current day that are after the
+ * current time.
+ */
 JsonArray ScheduleManager::getRemainingRingTimes() {
     String dayOfWeek = dayOfWeekStr(timeManager.getDayOfWeek());
     String currentTime = timeManager.getTime();
@@ -118,10 +151,15 @@ JsonArray ScheduleManager::getRemainingRingTimes() {
     return result;
 }
 
-// This method sorts the schedule times for each day in the schedule, modifying the schedule by reference
-// Each day (key) in the schedule, has an associated JsonArray of times that are sorted
-// A temporary std::vector is created for each day, allowing for easy sorting
-// The original JsonArray is cleared and repopulated with the sorted times
+
+/**
+ * The function `sortScheduleTimes` sorts the times in each day's schedule in ascending order.
+ * 
+ * @param schedule The `sortScheduleTimes` function takes a `DynamicJsonDocument` reference named
+ * `schedule` as a parameter. This `schedule` parameter is expected to contain a JSON object
+ * representing a schedule with days as keys and an array of times as values. The function iterates
+ * over each key-value pair in
+ */
 void ScheduleManager::sortScheduleTimes(DynamicJsonDocument& schedule) {
     for (JsonPair kv : schedule.as<JsonObject>()) {
         String day = kv.key().c_str();
@@ -145,7 +183,18 @@ void ScheduleManager::sortScheduleTimes(DynamicJsonDocument& schedule) {
 }
 
 
-// This method returns the day of the week as a string
+/**
+ * The function `dayOfWeekStr` converts a numerical day of the week to its corresponding string
+ * representation.
+ * 
+ * @param day The `dayOfWeekStr` function takes an integer `day` as input and returns a string
+ * representing the day of the week corresponding to that integer. The mapping is as follows:
+ * 
+ * @return The `dayOfWeekStr` function takes an integer `day` as input and returns a string
+ * representing the day of the week corresponding to that integer. The function uses a switch statement
+ * to match the input `day` with the corresponding day of the week and returns the string
+ * representation of that day. If the input `day` does not match any of the cases (1 to 7), an empty
+ */
 String ScheduleManager::dayOfWeekStr(int day) {
     switch (day) {
         case 1:
@@ -167,7 +216,20 @@ String ScheduleManager::dayOfWeekStr(int day) {
     }
 }
 
-// This method ensures that the received schedule is as expected
+
+/**
+ * The function `validateSchedule` checks if a given schedule JSON object contains valid time entries
+ * for each day of the week.
+ * 
+ * @param schedule The `validateSchedule` function takes a `DynamicJsonDocument` object named
+ * `schedule` as a parameter. This object is expected to contain schedules for each day of the week,
+ * where the keys are the names of the days ("monday", "tuesday", etc.) and the corresponding values
+ * are
+ * 
+ * @return The `validateSchedule` function returns a boolean value. It returns `true` if the schedule
+ * passes all validation checks, and `false` if any validation check fails during the iteration over
+ * the days of the week and their corresponding times.
+ */
 bool ScheduleManager::validateSchedule(DynamicJsonDocument& schedule) {
     const char* daysOfWeek[] = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
     
@@ -177,8 +239,6 @@ bool ScheduleManager::validateSchedule(DynamicJsonDocument& schedule) {
         
         JsonArray times = schedule[day].as<JsonArray>();
         if (!times) {
-            Serial.print(day);
-            Serial.println(" is not an array of times.");
             return false; // Day exists but is not an array, structure is invalid
         }
 
@@ -186,10 +246,6 @@ bool ScheduleManager::validateSchedule(DynamicJsonDocument& schedule) {
         for (JsonVariant v : times) {
             String time = v.as<String>();
             if (!isValidTimeFormat(time)) {
-                Serial.print(day);
-                Serial.print(": ");
-                Serial.print(time);
-                Serial.println(" is not a valid time.");
                 return false; // Time format is invalid
             }
         }
@@ -197,7 +253,17 @@ bool ScheduleManager::validateSchedule(DynamicJsonDocument& schedule) {
     return true; // Passed all checks
 }
 
-// Utility function to validate time format (HH:MM)
+
+/**
+ * The function `isValidTimeFormat` in C++ checks if a given time string is in a valid format (HH:MM).
+ * 
+ * @param time The `isValidTimeFormat` function checks if the input time string is in a valid format
+ * for a 24-hour clock. The function first checks if the length of the time string is 5 characters and
+ * if the character at index 2 is a colon ':'.
+ * 
+ * @return The `isValidTimeFormat` function returns a boolean value indicating whether the input time
+ * string has a valid format for representing a time (HH:MM).
+ */
 bool ScheduleManager::isValidTimeFormat(const String& time) {
     if (time.length() != 5) return false;
     if (time[2] != ':') return false;
@@ -206,17 +272,18 @@ bool ScheduleManager::isValidTimeFormat(const String& time) {
     return hour >= 0 && hour < 24 && minute >= 0 && minute < 60;
 }
 
-// This method loads the current schedule from EEPROM to be stored in memory when the device starts
+
+/**
+ * The function `loadScheduleFromEEPROM` loads a ring schedule from EEPROM, deserializes it into a JSON
+ * object, and prints the loaded schedule.
+ */
 void ScheduleManager::loadScheduleFromEEPROM() {
     String schedule = eepromManager.loadRingSchedule();
-    Serial.println("Loaded schedule from EEPROM: " + schedule);
     if (schedule.length() > 0 && schedule[0] != char(0xFF)) {
         // Clear the current schedule object
         currentSchedule.clear();
 
         // Deserialize the JSON string into the currentSchedule object
         deserializeJson(currentSchedule, schedule);
-        Serial.println("Schedule loaded successfully");
-        Serial.println(currentSchedule.as<String>());
     }
 }

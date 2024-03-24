@@ -57,11 +57,8 @@ void setupEndpoints() {
             return;
         }
 
-        Serial.println("SaveSchedule called");
-
         // Check if the request has a body (raw POST data)
         if (server.hasArg("plain") == false) { // Use "plain" for raw POST body
-            Serial.println("No schedule data received");
             server.send(400, "text/plain", "No schedule data received");
             return;
         }
@@ -72,7 +69,6 @@ void setupEndpoints() {
         DeserializationError error = deserializeJson(doc, schedule);
         
         if (error) { // Check for errors in parsing
-            Serial.println("parseObject() failed");
             server.send(500, "text/plain", "Error parsing JSON");
             return;
         }
@@ -88,7 +84,6 @@ void setupEndpoints() {
     server.on("/script/schedule.js", HTTP_GET, []() {
         File file = LittleFS.open("/script/schedule.js", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -100,7 +95,6 @@ void setupEndpoints() {
     server.on("/schedule", HTTP_GET, []() {
         File file = LittleFS.open("/schedule.html", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -118,10 +112,8 @@ void setupEndpoints() {
 
     server.on("/completeLogin", HTTP_POST, []() {
         if (server.hasArg("password")) {
-            Serial.println("Password received");
             String password = server.arg("password");
             if (authManager.checkPassword(password)) {
-                Serial.println("Password correct");
                 String token = authManager.generateToken();
                 String jsonResponse = "{\"token\":\"" + token + "\"}";
                 server.send(200, "application/json", jsonResponse);
@@ -148,7 +140,6 @@ void setupEndpoints() {
         String jsContent;
         File file = LittleFS.open("/script/auth.js", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -163,7 +154,6 @@ void setupEndpoints() {
         String jsContent;
         File file = LittleFS.open("/script/index.js", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -180,28 +170,24 @@ void setupEndpoints() {
             return;
         }
 
-        Serial.println("ToggleRelay called");
         relayManager.activateRelay(); // Activate the relay for saved duration
         server.send(200, "text/plain", "Relay toggle successful");
     });
 
     server.on("/getTodayRemainingRingTimes", HTTP_GET, []() {
         String result = scheduleManager.getTodayRemainingRingTimes(); // Get the remaining ring times for today
-        Serial.println("Remaining ring times: " + result);
         server.send(200, "text/plain", result);
     });
 
     server.on("/getServerMessages", HTTP_GET, []() {
         String output;
         serializeJson(systemMessages, output);
-        Serial.println("System messages: " + output);
         server.send(200, "application/json", output);
     });
 
     server.on("/", HTTP_GET, []() {
         File file = LittleFS.open("/index.html", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -222,7 +208,6 @@ void setupEndpoints() {
         String htmlContent;
         File file = LittleFS.open("/settings.html", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -266,22 +251,16 @@ server.on("/saveSettings", HTTP_POST, []() {
         return;
     }
 
-    Serial.println("SaveSettings called");
-
     // Extract and save the device name
     if (doc.containsKey("deviceName")) {
         deviceName = doc["deviceName"].as<String>();
         eepromManager.saveDeviceName(deviceName);
-        Serial.print("Device name received: ");
-        Serial.println(deviceName);
     }
 
     // Extract and save the ring duration
     if (doc.containsKey("ringDuration")) {
         ringDuration = doc["ringDuration"];
         eepromManager.saveRingDuration(ringDuration);
-        Serial.print("Ring duration received: ");
-        Serial.println(ringDuration);
     }
 
     // Extract, compare, and potentially save the unique URL
@@ -289,7 +268,6 @@ server.on("/saveSettings", HTTP_POST, []() {
         uniqueURL = doc["uniqueURL"].as<String>();
         if (uniqueURL != eepromManager.loadUniqueURL()) {
             eepromManager.saveUniqueURL(uniqueURL);
-            Serial.println("Unique URL updated: " + uniqueURL);
             server.send(200, "text/plain", "URL saved successfully, device will restart to apply changes");
             delay(1000); // Short delay before restart
             ESP.restart();
@@ -305,7 +283,6 @@ server.on("/saveSettings", HTTP_POST, []() {
         String jsContent;
         File file = LittleFS.open("/script/settings.js", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -319,7 +296,6 @@ server.on("/saveSettings", HTTP_POST, []() {
     server.on("/changepassword", HTTP_GET, []() {
         File file = LittleFS.open("/changePassword.html", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 
@@ -337,7 +313,6 @@ server.on("/saveSettings", HTTP_POST, []() {
         String jsContent;
         File file = LittleFS.open("/script/changePassword.js", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
         
@@ -348,8 +323,6 @@ server.on("/saveSettings", HTTP_POST, []() {
     });
 
     server.on("/finalizePassword", HTTP_POST, []() {
-        Serial.println("ChangePassword called");
-
         String providedToken = server.header("Authorization");
         if (!authManager.checkToken(providedToken)) {
             server.send(401, "text/plain", "Unauthorized");
@@ -376,7 +349,6 @@ server.on("/saveSettings", HTTP_POST, []() {
     server.on("/favicon.ico", HTTP_GET, []() {
         File file = LittleFS.open("/favicon.ico", "r");
         if (!file) {
-            Serial.println("Failed to open file for reading");
             return;
         }
 

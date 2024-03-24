@@ -14,7 +14,10 @@ $(document).ready(function() {
         fetchCurrentSchedule();
     }
 
-    // Initialize the schedule form with empty input fields
+    /**
+     * The function `initScheduleForm` dynamically creates a schedule form with days of the week, headings,
+     * and buttons for adding ring times.
+     */
     function initScheduleForm() {
         daysOfWeek.forEach(day => {
             const $dayDiv = $('<div class="day-schedule mb-4" id="schedule-' + day + '"></div>');
@@ -114,7 +117,6 @@ $(document).ready(function() {
         const reader = new FileReader();
         reader.onload = function(e) {
             const scheduleData = JSON.parse(e.target.result);
-            console.log("Imported schedule:", scheduleData); /****************************************************** */
             populateScheduleForm(scheduleData);
         };
         reader.readAsText(file);
@@ -148,7 +150,6 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(scheduleData) {
                 if (Object.keys(scheduleData).length > 0) {
-                    console.log("Current schedule:", scheduleData); /****************************************************** */
                     globalScheduleData = scheduleData;
                     populateScheduleForm(scheduleData);
                 }

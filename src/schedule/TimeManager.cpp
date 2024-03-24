@@ -6,11 +6,12 @@ This file handles time synchronization with NTP, keeping track of the current ti
 
 #include "TimeManager.h"
 
-// -6 * 3600 is the time zone offset for CST (Not in daylight savings time)
-// 60000 is the update interval in milliseconds
 TimeManager::TimeManager() {}
 
-// This method initializes the ezTime library and waits for the time to be synchronized
+/**
+ * The `begin` function in the `TimeManager` class sets the time zone to CST and waits for time
+ * synchronization from an NTP server.
+ */
 void TimeManager::begin() {
     // Set the time zone to CST, using Posix format which contains the daylight savings time rules
     myTimeZone.setPosix("CST6CDT,M3.2.0,M11.1.0");
@@ -21,12 +22,17 @@ void TimeManager::begin() {
     } else {
         eepromManager.addSystemMessage("Time synchronization failed.");
     }
-
-    // Print the current time to the serial monitor
-    Serial.println("Time: " + myTimeZone.dateTime("Y-m-d H:i:s"));
 }
 
-// This method returns the current time in HH:MM format
+/**
+ * The getTime function in the TimeManager class retrieves the current hour and minute, formats them
+ * with leading zeros if necessary, and returns the time in the format "HH:MM".
+ * 
+ * @return The `getTime()` function returns a formatted string representing the current time in the
+ * format "HH:MM" (hours:minutes). The function first retrieves the current hour and minute in the
+ * local time zone, then formats them with leading zeros if necessary, and finally returns the
+ * formatted time string.
+ */
 String TimeManager::getTime() {
     // Get the current hour and minute
     String hour = String(myTimeZone.hour());
@@ -37,23 +43,29 @@ String TimeManager::getTime() {
     if (minute.length() == 1) minute = "0" + minute;
 
     String time = hour + ":" + minute;
-    Serial.println("Time: " + time);
     return time;
 }
 
-// This method returns the current dateTime in YYYY-MM-DD HH:MM:SS format
-// Include the necessary header for time functions
+/**
+ * The getDateTime function in the TimeManager class retrieves and returns the current date and time in
+ * the format "Y-m-d H:i:s".
+ * 
+ * @return The `getDateTime` function returns a string containing the current date and time in the
+ * format "Y-m-d H:i:s".
+ */
 String TimeManager::getDateTime() {
     // Get the current date and time
     String dateTime = myTimeZone.dateTime("Y-m-d H:i:s");
-    Serial.println("Date Time: " + dateTime);
     return dateTime;
 }
 
-// This method returns day of the week (1 = Sunday, 7 = Saturday) 
+/**
+ * The function `getDayOfWeek` in the `TimeManager` class returns the current day of the week.
+ * 
+ * @return The function `getDayOfWeek()` is returning the day of the week as an integer value.
+ */
 int TimeManager::getDayOfWeek() {
     time_t now = myTimeZone.now();
     int dayOfWeek = weekday(now);
-    Serial.println("Day of week: " + dayOfWeek);
     return dayOfWeek;
 }

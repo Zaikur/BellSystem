@@ -47,8 +47,6 @@ DynamicJsonDocument systemMessages(1024); // Array to store system messages
 void setup() {
     pinMode(RESET_TRIGGER_PIN, INPUT_PULLUP); // Set the reset trigger pin as an input
 
-    Serial.begin(115200); // Start serial communication at 115200 baud
-
     // Initialize the system messages array
     systemMessages.to<JsonArray>();
 
@@ -56,12 +54,9 @@ void setup() {
     delay(DEBOUNCE_DELAY);
 
     // Check if the reset condition is met
-    // To reset the password to default, and clear WiFi credentials short GPIO 14 to ground WHILE pressing the reset button and hold for 1 second before releasing both.
+    // To reset the password to default, and clear WiFi credentials short GPIO 14 to ground WHILE pressing the reset button and hold 
+    // for 1 second before releasing both.
     if (digitalRead(RESET_TRIGGER_PIN) == LOW) {
-        Serial.println("Reset condition detected. Clearing settings...");
-
-        eepromManager.addSystemMessage("Reset condition detected. Default settings restored. Please select a new Password, Device Name, and Unique URL.");
-
         eepromManager.saveInitialized(false);   // Reset the password to default on reboot
         eepromManager.saveDeviceName("bellsystem"); // Reset the device name to default
         eepromManager.saveUniqueURL("bellsystem"); // Reset the unique URL to default
@@ -92,9 +87,6 @@ void setup() {
     deviceName = eepromManager.loadDeviceName();
     uniqueURL = eepromManager.loadUniqueURL();
     ringDuration = eepromManager.loadRingDuration();
-    Serial.println("Device name: " + deviceName);
-    Serial.println("Unique URL: " + uniqueURL);
-    Serial.println("Ring duration: " + String(ringDuration));
 
 
     // Initialize LittleFS file system and check if it was successful
@@ -132,8 +124,7 @@ void setup() {
     // Setup endpoints for the HTTP server
     setupEndpoints();
 
-    server.begin();
-    Serial.println("HTTP server started");
+    server.begin(); // Start the HTTP server
 }
 
 void loop() {
