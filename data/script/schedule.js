@@ -143,7 +143,7 @@ $(document).ready(function() {
 
     // Clear schedule button event handler
     $('#clearSchedule').click(function() {
-        if (confirm('Are you sure you want to clear the entire schedule? This action cannot be undone.')) {
+        if (confirm('Are you sure you want to clear the entire schedule?')) {
             // Clear each day's schedule
             daysOfWeek.forEach(day => clearDaySchedule(day));
         }

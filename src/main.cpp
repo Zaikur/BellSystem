@@ -101,6 +101,7 @@ void setup() {
     // Setup WiFi manager and connect to WiFi network if not already connected
     WiFiManager wifiManager;
 
+    wifiManager.setConnectTimeout(120); // Set the connection timeout to 120 seconds, after which the device will revert to AP mode 
     if (!wifiManager.autoConnect("BellSystemSetupAP")) {
         ESP.restart();
         delay(1000);
