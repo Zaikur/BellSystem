@@ -65,7 +65,7 @@ bool EEPROMLayoutManager::saveRingSchedule(const String& schedule) {
  * empty or the loaded schedule itself if it is not empty.
  */
 String EEPROMLayoutManager::loadRingSchedule() {
-    String schedule = loadString(scheduleStartAddr, 1000);
+    String schedule = loadString(scheduleStartAddr, 3000);
     if (schedule.length() > 0 && schedule[0] == char(0xFF)) {
         return ""; // Return an empty string if the schedule is empty
     } else {

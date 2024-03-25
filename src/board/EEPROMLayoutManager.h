@@ -55,7 +55,7 @@ private:
     const int passwordAddr = 400;
     const int saltAddr = 500;
     const bool initializedAddr = 600;
-    const int scheduleStartAddr = 2000;
+    const int scheduleStartAddr = 1000;
 };
 
 #endif

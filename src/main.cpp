@@ -45,6 +45,7 @@ DynamicJsonDocument systemMessages(1024); // Array to store system messages
 
 
 void setup() {
+    Serial.begin(115200); // Start the serial monitor
     pinMode(RESET_TRIGGER_PIN, INPUT_PULLUP); // Set the reset trigger pin as an input
 
     // Initialize the system messages array
@@ -134,6 +135,13 @@ void loop() {
     // Check if the bell should ring, every minute
     if (minuteChanged()) {
         scheduleManager.handleRing();
+
+        //Print system messages and current time
+        Serial.println("System Resources:");
+        Serial.println(timeManager.getTime());
+        Serial.println(ESP.getFreeHeap());
+        Serial.println(ESP.getFreeContStack());
+        Serial.println();
     }
 
 

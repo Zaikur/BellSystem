@@ -77,6 +77,7 @@ $(document).ready(function() {
                 headers: { 'Authorization': getAuthToken() },
                 data: JSON.stringify(scheduleData),
                 success: function(response) {
+                    globalScheduleData = scheduleData;
                     alert("Schedule updated successfully!");
                 },
                 error: function(xhr) {
@@ -93,7 +94,7 @@ $(document).ready(function() {
     // Export and import schedule buttons event handlers
     $('#exportScheduleBtn').click(function() {
         if (Object.keys(globalScheduleData).length === 0) {
-            alert("No schedule data to export.");
+            alert("No schedule data to export. Save the schedule first.");
             return;
         }
         const scheduleData = JSON.stringify(globalScheduleData, null, 2);
@@ -111,11 +112,16 @@ $(document).ready(function() {
         $('#importScheduleFile').click();
     });
     
+    // Import schedule file change event handler, reads the file and populates the schedule form
+    // Clear existing schedules for all days before importing new schedule
     $('#importScheduleFile').change(function(e) {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
+            // Clear existing schedules for all days before importing new schedule
+            daysOfWeek.forEach(day => clearDaySchedule(day));
+    
             const scheduleData = JSON.parse(e.target.result);
             populateScheduleForm(scheduleData);
         };
@@ -127,8 +133,7 @@ $(document).ready(function() {
         const mondayTimes = $('#schedule-monday .ring-time').map(function() { return $(this).val(); }).get();
         daysOfWeek.forEach(day => {
             if (day !== "monday") {
-                const $timesContainer = $(`#schedule-${day} .times-container`);
-                $timesContainer.empty(); // Clear existing times
+                clearDaySchedule(day); // Clear existing times
                 mondayTimes.forEach(time => {
                     addRingTime(day, time); // Use your existing function to add times
                 });
@@ -149,6 +154,11 @@ $(document).ready(function() {
             type: 'GET',
             dataType: 'json',
             success: function(scheduleData) {
+                // Check if the response is not empty
+                if (!scheduleData) {
+                    console.error("No schedule:", "Empty response");
+                    return;
+                }
                 if (Object.keys(scheduleData).length > 0) {
                     globalScheduleData = scheduleData;
                     populateScheduleForm(scheduleData);
@@ -167,6 +177,11 @@ $(document).ready(function() {
                 addRingTime(day, time);
             });
         });
+    }
+
+    // Function to clear schedule for a specific day
+    function clearDaySchedule(day) {
+        $(`#schedule-${day} .times-container`).empty(); // Assuming you have a container for each day's times
     }
 
     function addRingTime(day, time = '') {

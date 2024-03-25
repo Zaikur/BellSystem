@@ -65,7 +65,7 @@ void setupEndpoints() {
 
         // Getting the raw POST data
         String schedule = server.arg("plain");
-        DynamicJsonDocument doc(1024); // Adjust size according to your needs
+        DynamicJsonDocument doc(4096); // Create a JSON document to store the schedule with a capacity of 8192 bytes
         DeserializationError error = deserializeJson(doc, schedule);
         
         if (error) { // Check for errors in parsing

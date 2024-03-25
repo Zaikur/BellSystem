@@ -9,7 +9,7 @@ This file handles reading a schedule from the client, saving it to EEPROM, and c
 /****************PUBLIC******************/
 
 // Constructor for ScheduleManager class that initializes the EEPROMLayoutManager, TimeManager, and RelayManager objects
-ScheduleManager::ScheduleManager() : currentSchedule(1024) {
+ScheduleManager::ScheduleManager() : currentSchedule(4096) {
     loadScheduleFromEEPROM();
 }
 
@@ -29,14 +29,14 @@ ScheduleManager::ScheduleManager() : currentSchedule(1024) {
  * or failure to save the updated schedule to EEPROM.
  */
 bool ScheduleManager::updateSchedule(const String& jsonSchedule) {
-    DynamicJsonDocument tempSchedule(1024); // Temp schedule object (used for sorting times)
+    DynamicJsonDocument tempSchedule(4096); // Temp schedule object (used for sorting times)
 
     // Deserialize the JSON string into the tempSchedule object
     auto error = deserializeJson(tempSchedule, jsonSchedule);
-    if (error) {
+        if (error) {
         return false; // Indicate failure to update schedule
     }
-
+    
     
     // Validate the schedule structure and content
     if (!validateSchedule(tempSchedule)) {
@@ -58,13 +58,15 @@ bool ScheduleManager::updateSchedule(const String& jsonSchedule) {
 
 
 /**
- * The `getScheduleString` function in the `ScheduleManager` class returns the current schedule as a
- * string.
+ * The function `getScheduleString` returns a JSON string representation of the current schedule.
  * 
- * @return A string representation of the current schedule is being returned.
+ * @return The `getScheduleString` function returns a string representation of the `currentSchedule`
+ * object after serializing it using the `serializeJson` function.
  */
 String ScheduleManager::getScheduleString() {
-    return currentSchedule.as<String>();
+    String schedule;
+    serializeJson(currentSchedule, schedule);
+    return schedule;
 }
 
 /**
@@ -236,7 +238,7 @@ bool ScheduleManager::validateSchedule(DynamicJsonDocument& schedule) {
     for (const char* day : daysOfWeek) {
         // Check if the key for the day exists in the schedule
         if (!schedule.containsKey(day)) continue; // It's okay if a day doesn't have a schedule
-        
+
         JsonArray times = schedule[day].as<JsonArray>();
         if (!times) {
             return false; // Day exists but is not an array, structure is invalid
@@ -279,6 +281,7 @@ bool ScheduleManager::isValidTimeFormat(const String& time) {
  */
 void ScheduleManager::loadScheduleFromEEPROM() {
     String schedule = eepromManager.loadRingSchedule();
+
     if (schedule.length() > 0 && schedule[0] != char(0xFF)) {
         // Clear the current schedule object
         currentSchedule.clear();
