@@ -5,7 +5,7 @@ This file handles the main loop and setup of the program. It initializes the glo
 */
 
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+#include <.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiManager.h>
