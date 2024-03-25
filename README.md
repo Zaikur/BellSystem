@@ -76,7 +76,7 @@ The project prioritized a user-friendly interface and reliable scheduling. Effor
 
 **Here's my extremely rough diagram (Just pretend the light is a bell)**
 
-![Wiring Diagram.](/images/wiring-digram.jpg "Wiring Diagram")
+![Wiring Diagram.](/images/wiring-diagram.jpg "Wiring Diagram")
 
 **The assembled prototype**
 ![Assembled Bell System](/images/assembled.jpg "Assembled Bell System")
