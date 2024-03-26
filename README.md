@@ -13,7 +13,7 @@
 ## Overview
 This project was to develop a bell scheduling system using an ESP8266 microcontroller, designed to automate bell ringing schedules for institutions such as schools or churches. With WiFi connectivity, the system is easily adjustable via a web interface, making bell schedules manageable in real-time.
 
-I took on this project because I wanted to gain a better understanding of the fundamentals of writing code where limitations such as processing power and ram are strictly limited.
+I took on this project because I wanted to gain a better understanding of the fundamentals of writing code where there are strict limitations such as processing power, RAM, and storage.
 This system works by turning the ESP8266 board into a tiny server that can be accessed on your local network via IP address or a local URL. The URL is customizable so you're able to have multiple systems on one network without overlap.
 
 I went back and forth on how in depth the schedule should be. I finally settled on a 1-week customizable schedule that repeats indefinitely. I feel this is a good balance between the inflexibility of a 1-day schedule, and the required overhead of a monthly schedule. Each day of the week is customizable with its own set schedule.
