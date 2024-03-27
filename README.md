@@ -11,7 +11,7 @@
 - [Final Notes](#final-notes)
 
 ## Overview
-This project was to develop a bell scheduling system using an ESP8266 microcontroller, designed to automate bell ringing schedules for institutions such as schools or churches. With WiFi connectivity, the system is easily adjustable via a web interface, making bell schedules manageable in real-time.
+This project was to develop a bell scheduling system using an ESP8266 microcontroller, designed to automate bell ringing schedules for institutions such as schools, workplaces, or churches. With WiFi connectivity, the system is easily adjustable via a web interface, making bell schedules manageable in real-time.
 
 I took on this project because I wanted to gain a better understanding of the fundamentals of writing code where there are strict limitations such as processing power, RAM, and storage.
 This system works by turning the ESP8266 board into a tiny server that can be accessed on your local network via IP address or a local URL. The URL is customizable so you're able to have multiple systems on one network without overlap.
@@ -58,23 +58,24 @@ The project prioritized a user-friendly interface and reliable scheduling. Effor
 
 ## Optimizations
 **Significant optimizations that were introduced during development:**
-*(i.e. Things I messed up and had to fix later)*
+*(i.e. Things I learned along the way)*
 1. JSON Storage: Efficiently stores and retrieves schedules, reducing EEPROM wear. (Yeah it's emulated, but it's still faster)
 2. File System Usage: Leveraging LittleFS for webpage storage significantly reduced server processing load by streaming files directly to the client.
 3. Dynamic Time Zone Handling: Using ezTime with Posix format for self-contained daylight saving adjustments, eliminating reliance on external timezone servers.
 4. EEPROM Management: Organized EEPROM use facilitates future modifications.
-5. Security: Removed all hardcoded credentials. (Except the out of the box password, which you are strongly encouraged to change via system messages)
+5. Security: Removed all hard coded credentials. (Except the out of the box password, which you are strongly encouraged to change via system messages)
 
 
 ## Materials For This Project
 1. ESP8266 NodeMCU ESP-12E board (I used the one from HiLetgo)
 2. ESP8266 Breakout Board (To make wiring easier)
-3. 5 volt DC Power Supply (You could just use a USB cord to power it, but your relay will need power also)
+3. 5 volt DC Power Supply (You can use a USB cord to power the board, but your relay will also need power)
 4. 24 volt DC Power Supply (To power the bell, change this to what your bell requires)
 5. 5V One Channel  Relay (Make sure your board can trigger it with 3 volts)
 6. 5Amp - 10Amp Circuit Breaker (Just in case)
+7. A bell, or whatever you want to trigger on a schedule. 
 
-**Here's my extremely rough diagram (Just pretend the light is a bell)**
+**Here's my extremely rough diagram (The light is the bell)**
 
 ![Wiring Diagram.](/images/wiring-diagram.jpg "Wiring Diagram")
 
@@ -146,4 +147,4 @@ Need to change the logic to load a day schedule at a time, or just load the next
 
 ## Final Notes
 
-This project has been both frustrating at times, and very rewarding at others. If you get anything out of this project, see some easy improvements that could be made, or find other uses for it pleast let me know!
+This project has been both frustrating at times, and very rewarding at others. If you get anything out of this project, see some easy improvements that could be made, or find other uses for it please let me know!
