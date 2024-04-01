@@ -82,6 +82,15 @@ The project prioritized a user-friendly interface and reliable scheduling. Effor
 **The assembled prototype**
 ![Assembled Bell System](/images/assembled.jpg "Assembled Bell System")
 
+ **Home Page**
+ ![Home Page](/images/HomePage.png "Home Page")
+
+ **Schedule Page**
+ ![Schedule Page](/images/SchedulePage.png "Schedule Page")
+
+ **Settings Page**
+ ![Settings Page](/images/SettingsPage.png "Settings Page")
+
 
 ## Setup This Project
 ### Setting Up PlatformIO in Visual Studio Code
