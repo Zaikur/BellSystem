@@ -30,7 +30,6 @@ function checkServerTokenMatch(callback) {
             callback(true); // Token matches, invoke callback with true
         },
         error: function(xhr) {
-            // Removed the second callback call in the error handler to prevent double invocation
             callback(false); // Token does not match, invoke callback with false
         }
     });
