@@ -129,7 +129,10 @@ void setup() {
 }
 
 void loop() {
+    // Keep the time updated
     events();
+
+    // Listen for incoming connections
     MDNS.update();
 
     // Check if the bell should ring, every minute
@@ -137,7 +140,7 @@ void loop() {
         scheduleManager.handleRing();
     }
 
-
+    // Handle incoming client requests
     server.handleClient();
 }
 

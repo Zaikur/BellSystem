@@ -141,7 +141,7 @@ String AuthManager::generateSalt(size_t length) {
 String AuthManager::hashPasswordWithSalt(const String &password, const String &salt) {
     br_sha256_context mc;
     br_sha256_init(&mc);
-    String saltedPassword = salt + password; // Prepend or append
+    String saltedPassword = salt + password; // Prepend
     br_sha256_update(&mc, saltedPassword.c_str(), saltedPassword.length());
     unsigned char hash[br_sha256_SIZE];
     br_sha256_out(&mc, hash);

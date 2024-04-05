@@ -259,7 +259,7 @@ bool EEPROMLayoutManager::loadInitialized() {
  * character to
  * 
  * @return The function `saveString` returns a boolean value, which is the result of calling
- * `EEPROM.commit()`.
+ * `EEPROM.commit()`. 
  */
 bool EEPROMLayoutManager::saveString(const String& data, int startAddr) {
     unsigned int i;
