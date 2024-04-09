@@ -5,6 +5,28 @@ this file contains JQuery for the settings page
 */
 
 $(document).ready(function() {
+    // Get the MAC address from the server
+    $('#macAddress').click(function() {
+        checkServerTokenMatch(function(tokenMatches) {
+            if (!tokenMatches) {
+                showLoginModal();
+                return;
+            }
+
+            $.ajax({
+                url: '/getMacAddress',
+                type: 'GET',
+                success: function(response) {
+                    $('#macAddressDiv').text(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Failed to fetch MAC address:", error);
+                }
+            })
+        })
+    });
+
+
     // Load settings from the server
     $('#settingsForm').submit(function(event) {
         // Prevent form submission for manual validation

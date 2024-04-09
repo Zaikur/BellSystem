@@ -227,59 +227,67 @@ void setupEndpoints() {
         server.send(200, "text/html", htmlContent);
     });
 
-#include <ArduinoJson.h> // Make sure this include is at the top of your file
+    server.on("/getMacAddress", HTTP_GET, []() {
+        uint8_t mac[6];
+        WiFi.macAddress(mac);
+        char macStr[18] = {0}; // 17 characters for MAC address + 1 for string termination
+        sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        server.send(200, "text/plain", macStr);
+    });
 
-server.on("/saveSettings", HTTP_POST, []() {
-    // Assuming the token is sent in the Authorization header
-    String providedToken = server.header("Authorization");
 
-    if (!authManager.checkToken(providedToken)) {
-        // If the token check fails, respond with 401 Unauthorized
-        server.send(401, "text/plain", "Unauthorized");
-        return; // Stop further processing
-    }
 
-    // Read the raw POST data
-    String requestBody = server.arg("plain");
-    
-    // Use ArduinoJson to parse the JSON payload
-    DynamicJsonDocument doc(1024);
-    DeserializationError error = deserializeJson(doc, requestBody);
-    
-    if (error) {
-        server.send(500, "text/plain", "Error parsing JSON!");
-        return;
-    }
+    server.on("/saveSettings", HTTP_POST, []() {
+        // Assuming the token is sent in the Authorization header
+        String providedToken = server.header("Authorization");
 
-    // Extract and save the device name
-    if (doc.containsKey("deviceName")) {
-        deviceName = doc["deviceName"].as<String>();
-        eepromManager.saveDeviceName(deviceName);
-    }
+        if (!authManager.checkToken(providedToken)) {
+            // If the token check fails, respond with 401 Unauthorized
+            server.send(401, "text/plain", "Unauthorized");
+            return; // Stop further processing
+        }
 
-    // Extract and save the ring duration
-    if (doc.containsKey("ringDuration")) {
-        ringDuration = doc["ringDuration"];
-        eepromManager.saveRingDuration(ringDuration);
-    }
-
-    // Extract, compare, and potentially save the unique URL
-    if (doc.containsKey("uniqueURL")) {
-        uniqueURL = doc["uniqueURL"].as<String>();
-        if (uniqueURL != eepromManager.loadUniqueURL()) {
-            eepromManager.saveUniqueURL(uniqueURL);
-            server.send(200, "text/plain", "URL saved successfully, device will restart to apply changes");
-            delay(1000); // Short delay before restart
-            ESP.restart();
+        // Read the raw POST data
+        String requestBody = server.arg("plain");
+        
+        // Use ArduinoJson to parse the JSON payload
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, requestBody);
+        
+        if (error) {
+            server.send(500, "text/plain", "Error parsing JSON!");
             return;
         }
-    }
 
-    server.send(200, "text/plain", "Settings saved successfully.");
-});
+        // Extract and save the device name
+        if (doc.containsKey("deviceName")) {
+            deviceName = doc["deviceName"].as<String>();
+            eepromManager.saveDeviceName(deviceName);
+        }
+
+        // Extract and save the ring duration
+        if (doc.containsKey("ringDuration")) {
+            ringDuration = doc["ringDuration"];
+            eepromManager.saveRingDuration(ringDuration);
+        }
+
+        // Extract, compare, and potentially save the unique URL
+        if (doc.containsKey("uniqueURL")) {
+            uniqueURL = doc["uniqueURL"].as<String>();
+            if (uniqueURL != eepromManager.loadUniqueURL()) {
+                eepromManager.saveUniqueURL(uniqueURL);
+                server.send(200, "text/plain", "URL saved successfully, device will restart to apply changes");
+                delay(1000); // Short delay before restart
+                ESP.restart();
+                return;
+            }
+        }
+
+            server.send(200, "text/plain", "Settings saved successfully.");
+        });
 
 
-        server.on("/script/settings.js", HTTP_GET, []() {
+    server.on("/script/settings.js", HTTP_GET, []() {
         String jsContent;
         File file = LittleFS.open("/script/settings.js", "r");
         if (!file) {
