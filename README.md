@@ -9,6 +9,7 @@
 - [Lessons Learned](#lessons-learned)
 - [Known Bugs/Needs Improvement](#known-bugs-needs-improvement)
 - [Final Notes](#final-notes)
+- [Change Log](#change-log)
 
 ## Overview
 This project was to develop a bell scheduling system using an ESP8266 microcontroller, designed to automate bell ringing schedules for institutions such as schools, workplaces, or churches. With WiFi connectivity, the system is easily adjustable via a web interface, making bell schedules manageable in real-time.
@@ -157,3 +158,11 @@ Need to change the logic to load a day schedule at a time, or just load the next
 ## Final Notes
 
 This project has been both frustrating at times, and very rewarding at others. If you get anything out of this project, see some easy improvements that could be made, or find other uses for it please let me know!
+
+
+## Change Log
+
+**Duplicate Ring Edge Case 5/11/2024:** 
+1 in 200 rings trigger twice because of an unforseen interaction between the event being triggered and the call to update the time from NTP servers. 
+
+- Added additional check to ensure each ring is triggered once and only once.
