@@ -11,7 +11,8 @@ This file handles reading a schedule from the client, saving it to EEPROM, and c
 // Constructor for ScheduleManager class that initializes the EEPROMLayoutManager, TimeManager, and RelayManager objects
 ScheduleManager::ScheduleManager() : currentSchedule(4096) {
     loadScheduleFromEEPROM();
-    lastRingTime = "";
+    ringInterval = 60000; // 1 minute interval
+    lastRingTimeMillies = 0;
 }
 
 
@@ -74,8 +75,10 @@ String ScheduleManager::getScheduleString() {
  * The `handleRing` function checks if the bell should ring and activates the relay if necessary.
  */
 void ScheduleManager::handleRing() {
-    if (shouldRingNow()) {
+    unsigned long currentMillis = millis();
+    if (shouldRingNow() && (currentMillis - lastRingTimeMillies) >= ringInterval) {
         relayManager.activateRelay();
+        lastRingTimeMillies = currentMillis;
     }
 }
 
@@ -121,8 +124,7 @@ bool ScheduleManager::shouldRingNow() {
 
     // Look for the exact current time in today's schedule
     for (JsonVariant v : times) {
-        if (currentTime == v.as<String>() && currentTime != lastRingTime) {
-            lastRingTime = currentTime;
+        if (currentTime == v.as<String>()) {
             return true; // Time to ring the bell
         }
     }

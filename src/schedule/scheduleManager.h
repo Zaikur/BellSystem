@@ -28,9 +28,10 @@ class ScheduleManager {
         JsonArray getRemainingRingTimes();
         void sortScheduleTimes(DynamicJsonDocument& schedule);
         String dayOfWeekStr(int day);
-        String lastRingTime;
         void loadScheduleFromEEPROM();
         DynamicJsonDocument currentSchedule;
         bool validateSchedule(DynamicJsonDocument& schedule);
         bool isValidTimeFormat(const String& time);
+        unsigned long lastRingTimeMillies;
+        unsigned long ringInterval;
 };
